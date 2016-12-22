@@ -18,7 +18,6 @@
     XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
         cell = [[XZFeedsCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
-//        cell.backgroundColor = [UIColor grayColor];
     }
     return cell;
 }
@@ -34,52 +33,15 @@
         // 昵称
         self.nameLabel = [[UILabel alloc]init];
         self.nameLabel.numberOfLines = 0;
-        self.nameLabel.font = XZNameFont;
+        self.nameLabel.font = FONT_12;
         [self.contentView addSubview:self.nameLabel];
         
         // 正文
         self.contentLabel = [[UILabel alloc]init];
         self.contentLabel.numberOfLines = 0;
-//        self.contentLabel.lineBreakMode = NSLineBreakByWordWrapping;
-        self.contentLabel.font = XZTextFont;
+        self.contentLabel.font = FONT_13;
         [self.contentView addSubview:self.contentLabel];
-
-        
-        // 正文配图
-//        self.picView = [[UIImageView alloc]init];
-//        [self.contentView addSubview:self.picView];
-        
-        // 被转发的原博主昵称
-        self.repostNameLabel = [[UILabel alloc]init];
-        self.repostNameLabel.numberOfLines = 0;
-        self.repostNameLabel.backgroundColor = [UIColor lightGrayColor];
-        self.repostNameLabel.font = XZNameFont;
-        [self.contentView addSubview:self.repostNameLabel];
-        
-        // 被转发的原博原文
-        self.repostTextLabel = [[UILabel alloc]init];
-        self.repostTextLabel.numberOfLines = 0;
-        self.repostTextLabel.backgroundColor = [UIColor lightGrayColor];
-//        self.repostTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
-        self.repostTextLabel.font = XZTextFont;
-        [self.contentView addSubview:self.repostTextLabel];
-        
-        // 被转发的原博转发数
-        self.repostLabel = [[UILabel alloc]init];
-        self.repostLabel.numberOfLines = 1;
-        self.repostLabel.font = XZTextFont;
-        [self.contentView addSubview:self.repostLabel];
-        
-        // 被转发的原博评论数
-        self.commentLabel = [[UILabel alloc]init];
-        self.commentLabel.numberOfLines = 1;
-        self.commentLabel.font = XZTextFont;
-        [self.contentView addSubview:self.commentLabel];
-        
-
-        
     }
-    
     return self;
 }
 
@@ -88,13 +50,13 @@
 - (void)setFeedsFrame:(XZFeedsFrame *)feedsFrame {
     _feedsFrame = feedsFrame;
     
-    [self configureImageViews];
+    [self configureOptionalViews];
     
     [self configureCellData];
     [self configureCellFrame];
 }
 
-- (void)configureImageViews {
+- (void)configureOptionalViews {
     // 原微博配图
     if (self.feedsFrame.feeds.thumbnailPic != nil) {
         self.picViews = [NSMutableArray arrayWithCapacity:1];
@@ -113,20 +75,52 @@
         }
     }
     
-    // 被转发的原博配图
-    if (self.feedsFrame.feeds.retweetedThumbnailPic != nil) {
-        self.repostPicViews = [NSMutableArray arrayWithCapacity:1];
-        if (self.feedsFrame.feeds.retweetedPicURLs == nil) { // 只有一张图
-            UIImageView *imageView = [[UIImageView alloc]init];
-            [self.contentView addSubview:imageView];
-            [self.repostPicViews addObject:imageView];
-        } else { // 多张图
-            NSInteger repostPicCounts = [self.feedsFrame.feeds.retweetedPicURLs count];
-            NSLog(@"repostPicCounts: %ld", repostPicCounts);
-            for (int i = 0; i < repostPicCounts; i++) {
+    // 有转发微博
+    if (self.feedsFrame.feeds.retweetedStatuses != nil) {
+        // 被转发的原博background view
+        self.backgroundView = [[UIView alloc]initWithFrame:CGRectMake(50, 60, 260, 260)];
+        self.backgroundView.backgroundColor = [UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1];
+        [self.contentView addSubview:self.backgroundView];
+        
+        // 被转发的原博主昵称
+        self.repostNameLabel = [[UILabel alloc]init];
+        self.repostNameLabel.numberOfLines = 0;
+        self.repostNameLabel.font = FONT_12;
+        [self.backgroundView addSubview:self.repostNameLabel];
+        
+        // 被转发的原博原文
+        self.repostTextLabel = [[UILabel alloc]init];
+        self.repostTextLabel.numberOfLines = 0;
+        self.repostTextLabel.font = FONT_13;
+        [self.backgroundView addSubview:self.repostTextLabel];
+        
+        // 被转发的原博转发数
+        self.repostLabel = [[UILabel alloc]init];
+        self.repostLabel.numberOfLines = 1;
+        self.repostLabel.font = FONT_13;
+        [self.backgroundView addSubview:self.repostLabel];
+        
+        // 被转发的原博评论数
+        self.commentLabel = [[UILabel alloc]init];
+        self.commentLabel.numberOfLines = 1;
+        self.commentLabel.font = FONT_13;
+        [self.backgroundView addSubview:self.commentLabel];
+        
+        // 被转发的原博有配图
+        if (self.feedsFrame.feeds.retweetedThumbnailPic != nil) {
+            self.repostPicViews = [NSMutableArray arrayWithCapacity:1];
+            if (self.feedsFrame.feeds.retweetedPicURLs == nil) { // 只有一张图
                 UIImageView *imageView = [[UIImageView alloc]init];
-                [self.contentView addSubview:imageView];
+                [self.backgroundView addSubview:imageView];
                 [self.repostPicViews addObject:imageView];
+            } else { // 多张图
+                NSInteger repostPicCounts = [self.feedsFrame.feeds.retweetedPicURLs count];
+                NSLog(@"repostPicCounts: %ld", repostPicCounts);
+                for (int i = 0; i < repostPicCounts; i++) {
+                    UIImageView *imageView = [[UIImageView alloc]init];
+                    [self.backgroundView addSubview:imageView];
+                    [self.repostPicViews addObject:imageView];
+                }
             }
         }
     }
@@ -215,6 +209,7 @@
     
     // 没有转发内容，不展示该模块
     if (self.feedsFrame.feeds.retweetedStatuses != nil) {
+        self.backgroundView.frame = self.feedsFrame.repostBackgroungFrame;
         self.repostNameLabel.frame = self.feedsFrame.repostNameFrame;
         self.repostTextLabel.frame = self.feedsFrame.repostTextFrame;
         self.repostLabel.frame = self.feedsFrame.repostCountsFrame;
@@ -230,8 +225,18 @@
 }
 
 - (void)resetCellData {
-    [self.picViews removeAllObjects];
-    [self.repostPicViews removeAllObjects];
+    for (UIImageView *imageView in self.picViews) {
+        [imageView setImage:nil];
+    }
+    
+    for (UIImageView *imageView in self.repostPicViews) {
+        [imageView setImage:nil];
+    }
+    
+//    self.backgroundView
+    [self.repostNameLabel setText:nil];
+    [self.repostTextLabel setText:nil];
+
 }
 
 - (void)prepareForReuse {

@@ -71,7 +71,7 @@
 - (void)requestHomePageData {
     NSString *URLString = getFriendsTimeline;
     NSDictionary *parameters = @{@"access_token": accessToken,
-                                 @"count": @feedCount};
+                                 @"count": @FEEDS_COUNT};
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     [manager GET:URLString
       parameters:parameters
@@ -113,7 +113,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return feedCount;
+    return FEEDS_COUNT;
 }
 
 #pragma mark - Table view delegate

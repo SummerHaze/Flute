@@ -17,6 +17,7 @@
 @property (nonatomic, assign) CGRect contentFrame;
 @property (nonatomic, strong) NSMutableArray *picFrames;
 
+@property (nonatomic, assign) CGRect repostBackgroungFrame;
 @property (nonatomic, assign) CGRect repostNameFrame;
 @property (nonatomic, assign) CGRect repostTextFrame;
 @property (nonatomic, assign) CGRect repostCountsFrame;
