@@ -15,7 +15,6 @@
 #import "WeiboSDK.h"
 #import "WeiboAPI.h"
 
-
 @interface AppDelegate ()
 
 @end
@@ -26,7 +25,6 @@
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
     // 注册新浪微博SDK
     [WeiboSDK enableDebugMode:YES];
     [WeiboSDK registerApp:kAppKey];
@@ -74,6 +72,8 @@
     }
     
     [self.window makeKeyAndVisible];
+    
+
     
     return YES;
 }

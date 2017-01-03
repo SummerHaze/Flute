@@ -7,9 +7,9 @@
 //
 
 #import "XZFeedsFrame.h"
-#import "XZFeeds.h"
+#import "XZStatus.h"
 #import "WeiboAPI.h"
-
+#import <Masonry.h>
 
 @implementation XZFeedsFrame
 {
@@ -24,13 +24,13 @@
 }
 
 // setter
-- (void)setFeeds:(XZFeeds *)feeds {
+- (void)setFeeds:(XZStatus *)feeds {
     _feeds = feeds;
 
-    // 间距
-    picWidth = (WIDTH - iconViewWidth - PADDING_TEN * 3 - PADDING_FIVE * 2) / 3;
+    // 固定长宽
     iconViewWidth = 30;
     iconViewHeight = 30;
+    picWidth = (WIDTH - iconViewWidth - PADDING_TEN * 3 - PADDING_FIVE * 4) / 3;
     
     // 头像frame
     CGFloat iconViewX = PADDING_TEN;
@@ -103,13 +103,13 @@
     }
     
     if (_feeds.retweetedStatuses != nil) {
-        // 被转发微博昵称
-        baseX += PADDING_FIVE;
-        
+    
         backgroundViewX = baseX;
         backgroundViewY = baseY;
         
-        CGFloat repostNameLabelX = PADDING_FIVE;
+        // 被转发微博昵称
+        baseX = PADDING_FIVE;
+        CGFloat repostNameLabelX = baseX;
         CGSize repostNameSize = [self sizeWithString:_feeds.retweetedName
                                                 font:FONT_12
                                              maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
@@ -120,7 +120,7 @@
         baseY = CGRectGetMaxY(self.repostNameFrame) + PADDING_TEN;
         
         // 被转发微博文字
-        CGFloat repostTextLabelX = PADDING_FIVE;
+        CGFloat repostTextLabelX = baseX;
         CGFloat repostTextLabelY = baseY;
         CGSize repostTextSize = [self sizeWithString:_feeds.retweetedText
                                                 font:FONT_13
@@ -130,72 +130,72 @@
         self.repostTextFrame = CGRectMake(repostTextLabelX, repostTextLabelY, repostTextLabelWidth, repostTextLabelHeight);
         baseY = CGRectGetMaxY(self.repostTextFrame) + PADDING_TEN;
         
-//        // 被转发微博转发数
-//        CGFloat repostLabelX = baseX;
-//        CGFloat repostLabelY = baseY;
-//        CGSize repostLabelSize = [self sizeWithString:[NSString stringWithFormat:@"转发(%ld) ",_feeds.retweetedRepostCounts]
-//                                                 font:FONT_13
-//                                              maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
-//        CGFloat repostLabelWidth = repostLabelSize.width;
-//        CGFloat repostLabelHeight = repostLabelSize.height;
-//        self.repostCountsFrame = CGRectMake(repostLabelX, repostLabelY, repostLabelWidth, repostLabelHeight);
-//        
-//        // 被转发微博评论数
-//        CGFloat commentLabelX = CGRectGetMaxX(self.repostCountsFrame);
-//        CGFloat commentLabelY = baseY;
-//        CGSize commentLabelSize = [self sizeWithString:[NSString stringWithFormat:@"| 评论(%ld)",_feeds.retweetedCommentCounts]
-//                                                  font:FONT_13
-//                                               maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
-//        CGFloat commentLabelWidth = commentLabelSize.width;
-//        CGFloat commentLabelHeight = commentLabelSize.height;
-//        self.repostCommentCountsFrame = CGRectMake(commentLabelX, commentLabelY, commentLabelWidth, commentLabelHeight);
-//        baseY = CGRectGetMaxY(self.repostCountsFrame);
-//        
-//        // 被转发微博配图
-//        if (self.feeds.retweetedThumbnailPic != nil) {
-//            baseY += PADDING_TEN;
-//            if (self.feeds.retweetedPicURLs == nil) { // 只有一张图
-//                self.repostPicFrames = [NSMutableArray arrayWithCapacity:1];
-//                [self.repostPicFrames addObject:
-//                 [NSValue valueWithCGRect:CGRectMake(baseX,
-//                                                     baseY,
-//                                                     picWidth,
-//                                                     picWidth)]];
-//            } else { // 有多张图
-//                NSInteger count = [self.feeds.retweetedPicURLs count];
-//                self.repostPicFrames = [NSMutableArray arrayWithCapacity:count];
-//                for (int i = 0; i < count; i++) {
-//                    if (i < 3) { // 第一行
-//                        self.repostPicFrames[i] = [NSValue valueWithCGRect:CGRectMake(baseX + picWidth * i + PADDING_FIVE * i,
-//                                                                                      baseY,
-//                                                                                      picWidth,
-//                                                                                      picWidth)];
-//                    } else if (i >= 3 && i < 6) { // 第二行
-//                        self.repostPicFrames[i] = [NSValue valueWithCGRect:CGRectMake(baseX + picWidth * (i - 3) + PADDING_FIVE * (i - 3),
-//                                                                                      baseY + PADDING_FIVE + picWidth,
-//                                                                                      picWidth,
-//                                                                                      picWidth)];
-//                        
-//                    } else if (i >= 6 && i < 9) { // 第三行，配图最多三行
-//                        self.repostPicFrames[i] = [NSValue valueWithCGRect:CGRectMake(baseX + picWidth * (i - 6) + PADDING_FIVE * (i - 6),
-//                                                                                      baseY + PADDING_FIVE * 2 + picWidth * 2,
-//                                                                                      picWidth,
-//                                                                                      picWidth)];
-//                        
-//                    }}
-//            }
-//            NSValue *value = self.repostPicFrames.lastObject;
-//            baseY = CGRectGetMaxY(value.CGRectValue) + PADDING_TEN;
-//        }
-//        
-//        CGFloat backgroundWidth = WIDTH - PADDING_TEN * 3 - iconViewWidth - PADDING_FIVE;
-//        CGFloat backgroundHeight = baseY - backgroundViewY;
-//        self.repostBackgroungFrame = CGRectMake(backgroundViewX, backgroundViewY, backgroundWidth, backgroundHeight);
-
+        // 被转发微博转发数
+        CGFloat repostLabelX = baseX;
+        CGFloat repostLabelY = baseY;
+        CGSize repostLabelSize = [self sizeWithString:[NSString stringWithFormat:@"转发(%ld) ",_feeds.retweetedRepostCounts]
+                                                 font:FONT_13
+                                              maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
+        CGFloat repostLabelWidth = repostLabelSize.width;
+        CGFloat repostLabelHeight = repostLabelSize.height;
+        self.repostCountsFrame = CGRectMake(repostLabelX, repostLabelY, repostLabelWidth, repostLabelHeight);
+        
+        // 被转发微博评论数
+        CGFloat commentLabelX = CGRectGetMaxX(self.repostCountsFrame);
+        CGFloat commentLabelY = baseY;
+        CGSize commentLabelSize = [self sizeWithString:[NSString stringWithFormat:@"| 评论(%ld)",_feeds.retweetedCommentCounts]
+                                                  font:FONT_13
+                                               maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
+        CGFloat commentLabelWidth = commentLabelSize.width;
+        CGFloat commentLabelHeight = commentLabelSize.height;
+        self.repostCommentCountsFrame = CGRectMake(commentLabelX, commentLabelY, commentLabelWidth, commentLabelHeight);
+        baseY = CGRectGetMaxY(self.repostCountsFrame);
+        
+        // 被转发微博配图
+        if (self.feeds.retweetedThumbnailPic != nil) {
+            baseY += PADDING_TEN;
+            if (self.feeds.retweetedPicURLs == nil) { // 只有一张图
+                self.repostPicFrames = [NSMutableArray arrayWithCapacity:1];
+                [self.repostPicFrames addObject:
+                 [NSValue valueWithCGRect:CGRectMake(baseX,
+                                                     baseY,
+                                                     picWidth,
+                                                     picWidth)]];
+            } else { // 有多张图
+                NSInteger count = [self.feeds.retweetedPicURLs count];
+                self.repostPicFrames = [NSMutableArray arrayWithCapacity:count];
+                for (int i = 0; i < count; i++) {
+                    if (i < 3) { // 第一行
+                        self.repostPicFrames[i] = [NSValue valueWithCGRect:CGRectMake(baseX + picWidth * i + PADDING_FIVE * i,
+                                                                                      baseY,
+                                                                                      picWidth,
+                                                                                      picWidth)];
+                    } else if (i >= 3 && i < 6) { // 第二行
+                        self.repostPicFrames[i] = [NSValue valueWithCGRect:CGRectMake(baseX + picWidth * (i - 3) + PADDING_FIVE * (i - 3),
+                                                                                      baseY + PADDING_FIVE + picWidth,
+                                                                                      picWidth,
+                                                                                      picWidth)];
+                        
+                    } else if (i >= 6 && i < 9) { // 第三行，配图最多三行
+                        self.repostPicFrames[i] = [NSValue valueWithCGRect:CGRectMake(baseX + picWidth * (i - 6) + PADDING_FIVE * (i - 6),
+                                                                                      baseY + PADDING_FIVE * 2 + picWidth * 2,
+                                                                                      picWidth,
+                                                                                      picWidth)];
+                        
+                    }}
+            }
+            NSValue *value = self.repostPicFrames.lastObject;
+            baseY = CGRectGetMaxY(value.CGRectValue) + PADDING_TEN;
+        }
+        
+        CGFloat backgroundWidth = WIDTH - PADDING_TEN * 3 - iconViewWidth;
+        CGFloat backgroundHeight = baseY;
+        self.repostBackgroundViewFrame = CGRectMake(backgroundViewX, backgroundViewY, backgroundWidth, backgroundHeight);
+        baseY = backgroundHeight + backgroundViewY;
     }
 
     // cell高度跟随内容自适应
-    self.cellHeight = baseY;
+    self.cellHeight = baseY + PADDING_TEN;
 
 }
 

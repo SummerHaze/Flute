@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "XZFeeds.h"
+#import "XZStatus.h"
 
 @interface XZFeedsFrame : NSObject
 
@@ -17,7 +17,7 @@
 @property (nonatomic, assign) CGRect contentFrame;
 @property (nonatomic, strong) NSMutableArray *picFrames;
 
-@property (nonatomic, assign) CGRect repostBackgroungFrame;
+@property (nonatomic, assign) CGRect repostBackgroundViewFrame;
 @property (nonatomic, assign) CGRect repostNameFrame;
 @property (nonatomic, assign) CGRect repostTextFrame;
 @property (nonatomic, assign) CGRect repostCountsFrame;
@@ -28,6 +28,6 @@
 
 @property (nonatomic, assign) CGFloat cellHeight;
 
-@property (nonatomic, strong) XZFeeds *feeds;
+@property (nonatomic, strong) XZStatus *feeds;
 
 @end

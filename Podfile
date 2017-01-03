@@ -1,4 +1,5 @@
 platform :ios,  '7.0'
 pod 'FMDB'
 pod 'Masonry'
-pod ‘AFNetworking’
+pod 'AFNetworking'
+pod 'MJRefresh'

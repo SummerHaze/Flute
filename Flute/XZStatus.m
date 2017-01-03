@@ -1,16 +1,27 @@
 //
-//  XZFeeds.m
+//  XZStatus.m
 //  Flute
 //
 //  Created by xia on 12/16/16.
 //  Copyright © 2016 xia. All rights reserved.
 //
 
-#import "XZFeeds.h"
+#import "XZStatus.h"
 
-@implementation XZFeeds
+@implementation XZStatus
 
 #pragma mark - 原发微博信息
+
+// 微博ID
+- (NSUInteger)statusId {
+    NSNumber *statusId = [self.statuses objectForKey:@"id"];
+    return statusId.unsignedIntegerValue;
+}
+
+// 字符串型微博ID
+- (NSString *)statusIdStr {
+    return [self.statuses objectForKey:@"idstr"];
+}
 
 // 微博正文
 - (NSString *)text {

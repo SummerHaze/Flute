@@ -1,5 +1,5 @@
 //
-//  XZFeeds.h
+//  XZStatus.h
 //  Flute
 //
 //  Created by xia on 12/16/16.
@@ -8,10 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface XZFeeds : NSObject
+@interface XZStatus : NSObject
 
 // getFriendsTimeline最外层字段
-@property (nonatomic, copy) NSDictionary *statuses;
+@property (nonatomic) NSDictionary *statuses;
+
+// 微博ID信息
+@property (nonatomic, assign) NSUInteger statusId;
+@property (nonatomic, copy) NSString *statusIdStr;
 
 // 原发微博信息
 @property (nonatomic, copy) NSString *icon;

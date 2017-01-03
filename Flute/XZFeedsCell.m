@@ -8,7 +8,7 @@
 
 #import "XZFeedsCell.h"
 #import "XZFeedsFrame.h"
-#import "XZFeeds.h"
+#import "XZStatus.h"
 #import "WeiboAPI.h"
 
 @implementation XZFeedsCell
@@ -26,23 +26,10 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        // 头像
-        self.iconView = [[UIImageView alloc]init];
-        [self.contentView addSubview:self.iconView];
-        
-        // 昵称
-        self.nameLabel = [[UILabel alloc]init];
-        self.nameLabel.numberOfLines = 0;
-        self.nameLabel.font = FONT_12;
-        [self.contentView addSubview:self.nameLabel];
-        
-        // 正文
-        self.contentLabel = [[UILabel alloc]init];
-        self.contentLabel.numberOfLines = 0;
-        self.contentLabel.font = FONT_13;
-        [self.contentView addSubview:self.contentLabel];
+        return self;
+    } else {
+        return nil;
     }
-    return self;
 }
 
 #pragma mark - Setter
@@ -50,10 +37,29 @@
 - (void)setFeedsFrame:(XZFeedsFrame *)feedsFrame {
     _feedsFrame = feedsFrame;
     
+    [self configureRequiredViews];
     [self configureOptionalViews];
     
     [self configureCellData];
     [self configureCellFrame];
+}
+
+- (void)configureRequiredViews {
+    // 头像
+    self.iconView = [[UIImageView alloc]init];
+    [self.contentView addSubview:self.iconView];
+    
+    // 昵称
+    self.nameLabel = [[UILabel alloc]init];
+    self.nameLabel.numberOfLines = 0;
+    self.nameLabel.font = FONT_12;
+    [self.contentView addSubview:self.nameLabel];
+    
+    // 正文
+    self.contentLabel = [[UILabel alloc]init];
+    self.contentLabel.numberOfLines = 0;
+    self.contentLabel.font = FONT_13;
+    [self.contentView addSubview:self.contentLabel];
 }
 
 - (void)configureOptionalViews {
@@ -66,7 +72,6 @@
             [self.picViews addObject:imageView];
         } else { // 多张图
             NSInteger repostPicCounts = [self.feedsFrame.feeds.picURLs count];
-            NSLog(@"picCounts: %ld", repostPicCounts);
             for (int i = 0; i < repostPicCounts; i++) {
                 UIImageView *imageView = [[UIImageView alloc]init];
                 [self.contentView addSubview:imageView];
@@ -78,47 +83,46 @@
     // 有转发微博
     if (self.feedsFrame.feeds.retweetedStatuses != nil) {
         // 被转发的原博background view
-        self.backgroundView = [[UIView alloc]initWithFrame:CGRectMake(50, 60, 260, 260)];
-        self.backgroundView.backgroundColor = [UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1];
-        [self.contentView addSubview:self.backgroundView];
+        self.repostBackgroundView = [[UIView alloc]init];
+        self.repostBackgroundView.backgroundColor = [UIColor colorWithRed:230/255.0 green:230/255.0 blue:230/255.0 alpha:1];
+        [self.contentView addSubview:self.repostBackgroundView];
         
         // 被转发的原博主昵称
         self.repostNameLabel = [[UILabel alloc]init];
         self.repostNameLabel.numberOfLines = 0;
         self.repostNameLabel.font = FONT_12;
-        [self.backgroundView addSubview:self.repostNameLabel];
+        [self.repostBackgroundView addSubview:self.repostNameLabel];
         
         // 被转发的原博原文
         self.repostTextLabel = [[UILabel alloc]init];
         self.repostTextLabel.numberOfLines = 0;
         self.repostTextLabel.font = FONT_13;
-        [self.backgroundView addSubview:self.repostTextLabel];
+        [self.repostBackgroundView addSubview:self.repostTextLabel];
         
         // 被转发的原博转发数
         self.repostLabel = [[UILabel alloc]init];
         self.repostLabel.numberOfLines = 1;
         self.repostLabel.font = FONT_13;
-        [self.backgroundView addSubview:self.repostLabel];
+        [self.repostBackgroundView addSubview:self.repostLabel];
         
         // 被转发的原博评论数
         self.commentLabel = [[UILabel alloc]init];
         self.commentLabel.numberOfLines = 1;
         self.commentLabel.font = FONT_13;
-        [self.backgroundView addSubview:self.commentLabel];
+        [self.repostBackgroundView addSubview:self.commentLabel];
         
         // 被转发的原博有配图
         if (self.feedsFrame.feeds.retweetedThumbnailPic != nil) {
             self.repostPicViews = [NSMutableArray arrayWithCapacity:1];
             if (self.feedsFrame.feeds.retweetedPicURLs == nil) { // 只有一张图
                 UIImageView *imageView = [[UIImageView alloc]init];
-                [self.backgroundView addSubview:imageView];
+                [self.repostBackgroundView addSubview:imageView];
                 [self.repostPicViews addObject:imageView];
             } else { // 多张图
                 NSInteger repostPicCounts = [self.feedsFrame.feeds.retweetedPicURLs count];
-                NSLog(@"repostPicCounts: %ld", repostPicCounts);
                 for (int i = 0; i < repostPicCounts; i++) {
                     UIImageView *imageView = [[UIImageView alloc]init];
-                    [self.backgroundView addSubview:imageView];
+                    [self.repostBackgroundView addSubview:imageView];
                     [self.repostPicViews addObject:imageView];
                 }
             }
@@ -128,7 +132,7 @@
 
 // 配置cell的数据model
 - (void)configureCellData {
-    XZFeeds *feeds = self.feedsFrame.feeds;
+    XZStatus *feeds = self.feedsFrame.feeds;
     
     NSURL *url = [NSURL URLWithString:feeds.icon];
     NSData *data = [NSData dataWithContentsOfURL:url];
@@ -164,8 +168,8 @@
     if (feeds.retweetedStatuses != nil) {
         self.repostNameLabel.text = feeds.retweetedName;
         self.repostTextLabel.text = feeds.retweetedText;
-        self.repostLabel.text = [NSString stringWithFormat:@"转发(%ld) ",feeds.retweetedRepostCounts];
-        self.commentLabel.text = [NSString stringWithFormat:@"| 评论(%ld)",feeds.retweetedCommentCounts];
+        self.repostLabel.text = [NSString stringWithFormat:@"转发(%ld) ",(long)feeds.retweetedRepostCounts];
+        self.commentLabel.text = [NSString stringWithFormat:@"| 评论(%ld)",(long)feeds.retweetedCommentCounts];
         
         if (feeds.retweetedThumbnailPic != nil) {
             if (feeds.retweetedPicURLs == nil) { // 只有一张配图
@@ -191,6 +195,7 @@
 
 // 配置cell的尺寸model
 - (void)configureCellFrame {
+    
     self.iconView.frame = self.feedsFrame.iconFrame;
     self.nameLabel.frame = self.feedsFrame.nameFrame;
     
@@ -209,7 +214,7 @@
     
     // 没有转发内容，不展示该模块
     if (self.feedsFrame.feeds.retweetedStatuses != nil) {
-        self.backgroundView.frame = self.feedsFrame.repostBackgroungFrame;
+        self.repostBackgroundView.frame = self.feedsFrame.repostBackgroundViewFrame;
         self.repostNameLabel.frame = self.feedsFrame.repostNameFrame;
         self.repostTextLabel.frame = self.feedsFrame.repostTextFrame;
         self.repostLabel.frame = self.feedsFrame.repostCountsFrame;
@@ -225,20 +230,12 @@
 }
 
 - (void)resetCellData {
-    for (UIImageView *imageView in self.picViews) {
-        [imageView setImage:nil];
+    for (UIView *item in [self.contentView subviews]) {
+        [item removeFromSuperview];
     }
-    
-    for (UIImageView *imageView in self.repostPicViews) {
-        [imageView setImage:nil];
-    }
-    
-//    self.backgroundView
-    [self.repostNameLabel setText:nil];
-    [self.repostTextLabel setText:nil];
-
 }
 
+// 复用cell前清理之
 - (void)prepareForReuse {
     [super prepareForReuse];
     [self resetCellData];

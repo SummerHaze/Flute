@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface XZHomeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate>
+@interface XZHomeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate, UIScrollViewDelegate>
 
 //@property (nonatomic, strong) UITableView *tableView;
 
