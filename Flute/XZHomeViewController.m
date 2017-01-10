@@ -25,13 +25,13 @@
 @implementation XZHomeViewController
 {
     XZLogin *login;
-    XZFeedsFrame *feedsFrame;
+//    XZFeedsFrame *feedsFrame;
     NSMutableArray *requestedHomeFeeds;
     NSMutableArray *cachedHomeFeeds;
     NSMutableArray *homeFeeds;
     NSMutableDictionary *feedsResponse;
     NSInteger pageNumber;
-    CGPoint offset;
+    CGFloat offsetY;
     XZDBOperation *dbOp;
     NSString *DBPath;
     
@@ -47,36 +47,72 @@
     self.tableView.dataSource = self;
     
     [self.view addSubview:self.tableView];
+    
+    // 上拉刷新控件
+    __weak __typeof(self) weakSelf = self;
+    // 设置回调（一旦进入刷新状态就会调用这个refreshingBlock）
+    self.tableView.mj_footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadMore];
+    }];
+    
+//    self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMore)];
+}
+
+- (void)configureDB {
+    dbOp = [[XZDBOperation alloc]init];
+    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString *cacheDirectory = [cachePaths objectAtIndex:0];
+    DBPath = [cacheDirectory stringByAppendingPathComponent:@"weibo.db"];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.tabBarController.delegate = self;
-    login = [XZLogin sharedInstance];
     
+    login = [XZLogin sharedInstance];
     homeFeeds = [[NSMutableArray alloc]init];
     requestedHomeFeeds = [[NSMutableArray alloc]init];
-    
+
     pageNumber = 1;
-    offset = CGPointZero;
-    sinceID = 0;
+    offsetY = 0.0;
+    sinceId = 0;
+    maxId = 0;
+    
+//    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+    
+    // 配置数据库相关操作
+    [self configureDB];
     
     // 配置子视图
     [self configureSubviews];
     
-    // 上拉刷新控件
-    self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingTarget:self refreshingAction:@selector(loadMore)];
-   
+    
+//    [self.tableView addObserver:self forKeyPath:@"contentOffset" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
+    
+#ifdef DEBUG_CACHE
     [self loadCachedHomePageData]; // 先加载缓存
-//    [self requestHomePageData]; // 无论是否有缓存，立即刷新
+#else
+    [self requestHomePageData]; // 无论是否有缓存，立即刷新
+#endif
+    
 }
+
+//- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+//{
+//    CGPoint contentOffset = [[change valueForKey:NSKeyValueChangeNewKey]CGPointValue];
+//    NSLog(@"observe-contentOffset: %f", contentOffset.y);
+//}
+
 
 // 上拉刷新触发
 - (void)loadMore {
     pageNumber += 1;
+#ifdef DEBUG_CACHE
     [self loadCachedHomePageData];
-//    [self requestHomePageData];
+#else
+    [self requestHomePageData];
+#endif
 }
 
 - (void)didReceiveMemoryWarning {
@@ -86,6 +122,7 @@
 
 - (void)dealloc {
     NSLog(@"homeViewController dealloc");
+//    [self.tableView removeObserver:self forKeyPath:@"contentOffset"];
 }
 
 - (void)requestHomePageData {
@@ -93,16 +130,16 @@
     NSDictionary *parameters = @{@"access_token": accessToken,
                                  @"count": @FEEDS_COUNT,
                                  @"page": [NSNumber numberWithInteger:pageNumber],
-                                 @"since_id": [NSNumber numberWithInteger:sinceId]};
+                                 @"since_id": [NSNumber numberWithInteger:sinceId],
+                                 @"max_id": [NSNumber numberWithInteger:maxId]};
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     [manager GET:URLString
       parameters:parameters
         progress:nil
          success:^(NSURLSessionDataTask *task, id responseObject) {
-             [self.tableView.mj_footer endRefreshing]; //  隐藏刷新控件
+             
              NSLog(@">>>Request Home Page Success");
-//             NSLog(@">>>Request Home Page Success: %@--%@",[responseObject class], responseObject);
              NSArray *statuses = [responseObject objectForKey:@"statuses"];
              NSInteger count = [statuses count];
              
@@ -110,13 +147,17 @@
                  XZStatus *feeds = [[XZStatus alloc]init];
                  feeds.statuses = statuses[i];
                  [requestedHomeFeeds addObject:feeds];
+                 [homeFeeds addObject:feeds];
              }
              
+             // 请求成功要向DB写缓存
              BOOL success = [dbOp writeToDB:DBPath withData:requestedHomeFeeds];
              
-             homeFeeds = requestedHomeFeeds;
+//             homeFeeds = requestedHomeFeeds;
+             [self.tableView setContentOffset:CGPointMake(0, offsetY)];
              [self.tableView reloadData];
-             self.tableView.contentOffset = offset;
+             [self.tableView.mj_footer endRefreshing]; //  隐藏刷新控件
+             
          }
          failure:^(NSURLSessionDataTask *task, NSError *error) {
              [self.tableView.mj_footer endRefreshing];
@@ -127,57 +168,49 @@
 }
 
 - (void)loadCachedHomePageData {
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cacheDirectory = [cachePaths objectAtIndex:0];
-    DBPath = [cacheDirectory stringByAppendingPathComponent:@"weibo.db"];
-    
-    dbOp = [[XZDBOperation alloc]init];
+    NSString *sql = @"";
     
     if (pageNumber == 1) { // 首次加载，需要判断db是否存在，是否有缓存数据，并取出maxId
         [dbOp DBExistAtPath:DBPath];
         maxId = [dbOp dataExistInDB:DBPath];
         NSLog(@"maxId is: %ld", maxId);
-    }
-    
-    if (maxId) { // 有缓存先读取缓存
         
-//        NSString *sql = nil;
-//        if (params[@"since_id"]) { // 下拉刷新
+        if (maxId) { // 有缓存先读取缓存
 //            sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE idstr > %@ ORDER BY idstr DESC LIMIT 20;", params[@"since_id"]];
-//        } else if (params[@"max_id"]) { // 上拉刷新
 //            sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE idstr <= %@ ORDER BY idstr DESC LIMIT 20;", params[@"max_id"]];
 //        }
-        
-        NSString *sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE id <= %ld ORDER BY id DESC LIMIT %d", maxId, FEEDS_COUNT + 1];
-        cachedHomeFeeds = (NSMutableArray *)[dbOp fetchDataFromDB:DBPath usingSql:sql]; // 数组，内存字典
-//        NSMutableArray *tmpFeeds = [NSMutableArray arrayWithCapacity:1];
-        
-        for (NSInteger i = 0; i < [cachedHomeFeeds count]; i++) {
+            
+            sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE id <= %ld ORDER BY id DESC LIMIT %d", maxId, FEEDS_COUNT];
+        }
+    } else {
+        sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE id < %ld ORDER BY id DESC LIMIT %d", maxId, FEEDS_COUNT];
+    }
+    
+    NSLog(@"sql: %@", sql);
+    
+    cachedHomeFeeds = (NSMutableArray *)[dbOp fetchDataFromDB:DBPath usingSql:sql]; // 数组，内存字典
+    NSInteger count = MIN([cachedHomeFeeds count], FEEDS_COUNT); // 缓存数据可能不够一页
+    
+    if (count == 0) {
+        NSLog(@"本地缓存已全部加载完毕, 向网络请求");
+        [self requestHomePageData];
+    } else {
+        for (NSInteger i = 0; i < count; i++) {
             XZStatus *feeds = [[XZStatus alloc]init];
-            feeds.statuses = cachedHomeFeeds[i]; // sinceID的获取没有这么粗暴！！！
+            feeds.statuses = cachedHomeFeeds[i];
 //            sinceID = feeds.statusId;
             [homeFeeds addObject:feeds];
-            if (i == [cachedHomeFeeds count] - 1) {
+            if (i == count - 1) {
                 maxId = feeds.statusId;
                 NSLog(@"maxId's changed to: %ld", maxId);
             }
         }
-        
+
         [self.tableView reloadData];
     }
-
+    
+    [self.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
 }
-
-//- (NSUInteger)loadMaxId {
-//    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-//    NSString *cacheDirectory = [cachePaths objectAtIndex:0];
-//    DBPath = [cacheDirectory stringByAppendingPathComponent:@"weibo.db"];
-//    
-//    dbOp = [[XZDBOperation alloc]init];
-//    [dbOp DBExistAtPath:DBPath];
-//    
-//    
-//}
 
 #pragma mark - Table view datasource
 
@@ -185,7 +218,7 @@
     XZFeedsCell *cell = [XZFeedsCell cellWithTableView:tableView];
 
     if ([homeFeeds count] != 0) {
-        feedsFrame = [[XZFeedsFrame alloc]init];
+        XZFeedsFrame *feedsFrame = [[XZFeedsFrame alloc]init];
         NSLog(@"current feed: %ld",indexPath.row);
         feedsFrame.feeds = homeFeeds[indexPath.row];
         cell.feedsFrame = feedsFrame;
@@ -196,14 +229,19 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    XZFeedsFrame *feedsFrame = [[XZFeedsFrame alloc]init];
+    feedsFrame.feeds = homeFeeds[indexPath.row];
+    NSLog(@"Row %ld Cell Heigh: %f", (long)indexPath.row, feedsFrame.cellHeight);
     return feedsFrame.cellHeight;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSInteger count = FEEDS_COUNT * MAX(pageNumber,1);
+    NSInteger count = FEEDS_COUNT * pageNumber;
+    
     if (!count) { // count为0时隐藏footer，这里体验再优化下
         self.tableView.mj_footer.hidden = YES;
     }
+    
     return count;
 }
 
@@ -219,17 +257,25 @@
 - (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
     UINavigationController *controller = (UINavigationController *)viewController;
     if ([controller.childViewControllers[0] isKindOfClass:[self class]]) {
+//        pageNumber += 1;
+        
+#ifdef DEBUG_CACHE
+        NSLog(@"手动点击tabBar不触发页面刷新");
+        [self.tableView reloadData];
+#else
         NSLog(@"手动点击tabBar触发页面刷新");
-        pageNumber += 1;
         [self requestHomePageData];
+#endif
     }
 }
 
 #pragma mark - UIScrollView delegate
 
 //- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-//    offset = self.tableView.contentOffset;
-//    NSLog(@"offset: %f",offset.y);
+//    offsetY = self.tableView.contentOffset.y;
+//    NSLog(@"222tableView ContentOffset : %f",self.tableView.contentOffset.y);
+//    NSLog(@"333tableView ContentInset : %f, %f",self.tableView.contentInset.top, self.tableView.contentInset.bottom);
+//    NSLog(@"444tableView ContentSize : %f, %f",self.tableView.contentSize.width, self.tableView.contentSize.height);
 //}
 
 @end

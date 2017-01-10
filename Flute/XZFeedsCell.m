@@ -17,7 +17,7 @@
     static NSString *identifier = @"FeedsCell";
     XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if (cell == nil) {
-        cell = [[XZFeedsCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
+       cell = [[XZFeedsCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifier];
     }
     return cell;
 }
@@ -239,6 +239,7 @@
 - (void)prepareForReuse {
     [super prepareForReuse];
     [self resetCellData];
+    
 }
 
 @end

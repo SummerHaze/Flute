@@ -35,7 +35,7 @@
         NSLog(@"检查是否有缓存——打开DB失败");
         return 0;
     } else {
-        NSString *query = @"select id from status order by id desc limit 1";
+        NSString *query = @"SELECT id FROM status ORDER BY id DESC LIMIt 1";
         FMResultSet *s = [db executeQuery:query];
         if ([s next] == NO) {
             NSLog(@"status表中无数据");
@@ -88,7 +88,7 @@
     // 确保待写入的数据不为空
     if ((data != nil) && ([data count] != 0)) {
         for (XZStatus *item in data) {
-            NSString *insert = @"INSERT INTO status (ID, IDSTR, STATUS) VALUES(:id,:idstr,:status);";
+            NSString *insert = @"INSERT OR IGNORE INTO status (ID, IDSTR, STATUS) VALUES(:id,:idstr,:status)"; // 如果有主键重复的条目则忽略，不重复写入
             NSData *statusData = [NSKeyedArchiver archivedDataWithRootObject:item.statuses];
             if (![db executeUpdate:insert
               withArgumentsInArray:@[[NSNumber numberWithUnsignedInteger:item.statusId],
