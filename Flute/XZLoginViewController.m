@@ -86,7 +86,7 @@
         UITabBarController *tabBarController = (UITabBarController *)self.view.superview.nextResponder;
         UINavigationController *navigationController = tabBarController.childViewControllers[0];
         XZHomeViewController *homeViewController = (XZHomeViewController *)navigationController.topViewController;
-        [homeViewController requestHomePageData];
+        [homeViewController requestHomePageDataWithSinceId:0 orMaxId:0];
     
         // 登录成功后，将loginViewController从顶层移除
 //        [self willMoveToParentViewController:nil];

@@ -35,7 +35,7 @@
         NSLog(@"检查是否有缓存——打开DB失败");
         return 0;
     } else {
-        NSString *query = @"SELECT id FROM status ORDER BY id DESC LIMIt 1";
+        NSString *query = @"SELECT id FROM status ORDER BY id DESC LIMIT 1";
         FMResultSet *s = [db executeQuery:query];
         if ([s next] == NO) {
             NSLog(@"status表中无数据");

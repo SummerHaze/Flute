@@ -12,6 +12,6 @@
 
 //@property (nonatomic, strong) UITableView *tableView;
 
-- (void)requestHomePageData;
+- (void)requestHomePageDataWithSinceId:(NSUInteger)sinceId orMaxId:(NSUInteger)maxId;
 
 @end
