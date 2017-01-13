@@ -25,8 +25,8 @@
 @property (nonatomic, strong) UILabel *repostLabel;             // 被转发的原博转发数
 @property (nonatomic, strong) UILabel *commentLabel;            // 被转发的原博评论数
 
-@property (nonatomic, strong) XZFeedsFrame *feedsFrame;         // frame model
+//@property (nonatomic, strong) XZFeedsFrame *feedsFrame;         // frame model
+@property (nonatomic, strong) XZStatus *status;
 
-+ (instancetype)cellWithTableView:(UITableView *)tableView;
 
 @end

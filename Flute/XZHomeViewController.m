@@ -15,6 +15,7 @@
 #import "XZFeedsFrame.h"
 #import "MJRefresh.h"
 #import "XZDBOperation.h"
+#import "UITableView+FDTemplateLayoutCell.h"
 
 @interface XZHomeViewController ()
 
@@ -39,6 +40,8 @@
 //    NSUInteger _maxIdFromCache;
     NSUInteger _maxId;
 }
+
+static NSString *identifier = @"FeedsCell";
 
 #pragma mark - Life cycle
 
@@ -66,6 +69,8 @@
     // 加载数据
     [self loadData];
     
+
+    
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -84,18 +89,18 @@
                       CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    [self.tableView registerClass:[XZFeedsCell class] forCellReuseIdentifier:@"FeedsCell"];
+//    self.tableView.fd_debugLogEnabled = YES;
     
     [self.view addSubview:self.tableView];
     
     // 上拉刷新控件
     __weak __typeof(self) weakSelf = self;
-    // 设置回调（一旦进入刷新状态就会调用这个refreshingBlock）
     self.tableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
         [weakSelf loadByDraggingUp];
     }];
     
     // 下拉刷新控件
-    // 设置回调（一旦进入刷新状态就会调用这个refreshingBlock）
     self.tableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
         [weakSelf loadByDraggingDown];
     }];
@@ -229,13 +234,11 @@
 #pragma mark - Table view datasource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    XZFeedsCell *cell = [XZFeedsCell cellWithTableView:tableView];
+    XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
 
     if ([homeFeeds count] == FEEDS_COUNT * pageNumber) {
-        XZFeedsFrame *feedsFrame = [[XZFeedsFrame alloc]init];
         NSLog(@"current feed: %ld",indexPath.row);
-        feedsFrame.feeds = homeFeeds[indexPath.row];
-        cell.feedsFrame = feedsFrame;
+        cell.status = homeFeeds[indexPath.row];
         return cell;
     } else {
         return cell;
@@ -243,14 +246,25 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+//    XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
+    
     if ([homeFeeds count] == FEEDS_COUNT * pageNumber) {
-        XZFeedsFrame *feedsFrame = [[XZFeedsFrame alloc]init];
-        feedsFrame.feeds = homeFeeds[indexPath.row];
-//        NSLog(@"Row %ld Cell Heigh: %f", (long)indexPath.row, feedsFrame.cellHeight);
-        return feedsFrame.cellHeight;
+        CGFloat height = [tableView fd_heightForCellWithIdentifier:identifier configuration:^(XZFeedsCell *cell)
+        {
+            cell.status = homeFeeds[indexPath.row];
+        }];
+//        NSLog(@"caculated height: %f",height);
+        return height;
     } else {
         return 0;
     }
+    
+}
+
+- (void)configureCell:(XZFeedsCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+//    cell.fd_enforceFrameLayout = NO; // Enable to use "-sizeThatFits:"
+    
+    cell.status = homeFeeds[indexPath.row];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
