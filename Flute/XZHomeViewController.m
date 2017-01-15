@@ -90,7 +90,7 @@ static NSString *identifier = @"FeedsCell";
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     [self.tableView registerClass:[XZFeedsCell class] forCellReuseIdentifier:@"FeedsCell"];
-//    self.tableView.fd_debugLogEnabled = YES;
+    self.tableView.fd_debugLogEnabled = YES;
     
     [self.view addSubview:self.tableView];
     

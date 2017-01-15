@@ -19,6 +19,7 @@
 * [AFNetworking](https://github.com/AFNetworking/AFNetworking)
 * [Masonry](https://github.com/SnapKit/Masonry)
 * [MJRefresh](https://github.com/CoderMJLee/MJRefresh)
+* [UITableView-FDTemplateLayoutCell](https://github.com/forkingdog/UITableView-FDTemplateLayoutCell)
 * more to be added
 
 
