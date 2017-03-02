@@ -7,7 +7,6 @@
 * App所调API全部源自[新浪微博官方公开API](http://open.weibo.com/wiki/%E5%BE%AE%E5%8D%9AAPI)
 
 ##为什么叫Flute？
-* 我喜欢
 * 取名字困难户
 
 ##为什么还要做微博第三方？
@@ -20,7 +19,8 @@
 * [Masonry](https://github.com/SnapKit/Masonry)
 * [MJRefresh](https://github.com/CoderMJLee/MJRefresh)
 * [UITableView-FDTemplateLayoutCell](https://github.com/forkingdog/UITableView-FDTemplateLayoutCell)
-* more to be added
+* [SDWebImage](https://github.com/rs/SDWebImage)
+* More
 
 
 

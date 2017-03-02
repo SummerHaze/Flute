@@ -9,6 +9,7 @@
 #import "XZLoginViewController.h"
 #import "XZLogin.h"
 #import "XZHomeViewController.h"
+#import "UITableView+FDTemplateLayoutCell.h"
 
 @interface XZLoginViewController ()
 
@@ -86,7 +87,22 @@
         UITabBarController *tabBarController = (UITabBarController *)self.view.superview.nextResponder;
         UINavigationController *navigationController = tabBarController.childViewControllers[0];
         XZHomeViewController *homeViewController = (XZHomeViewController *)navigationController.topViewController;
-        [homeViewController requestHomePageDataWithSinceId:0 orMaxId:0];
+        [homeViewController.dataLoader requestHomePageDataWithSinceId:0 orMaxId:0 completion:^(BOOL success, NSArray *results, NSUInteger maxId) {
+            if (success == YES) {
+                [homeViewController.homeFeeds addObjectsFromArray:results];
+                
+                [homeViewController.tableView reloadData];
+//                [homeViewController.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
+//                [homeViewController.tableView.mj_header endRefreshing];
+                
+                // 请求成功要向DB写缓存
+                [homeViewController.dataLoader.dbOperation writeToDB:homeViewController.dbPath withData:results];
+            } else {
+//                [homeViewController.tableView.mj_header endRefreshing];
+//                [homeViewController.tableView.mj_footer endRefreshing];
+                homeViewController.pageNumber -= 1;
+            }
+        } ];
     
         // 登录成功后，将loginViewController从顶层移除
 //        [self willMoveToParentViewController:nil];

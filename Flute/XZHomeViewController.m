@@ -7,38 +7,28 @@
 //
 
 #import "XZHomeViewController.h"
-#import <AFNetworking/AFNetworking.h>
 #import "XZLogin.h"
 #import "WeiboAPI.h"
 #import "XZFeedsCell.h"
 #import "XZStatus.h"
-#import "XZFeedsFrame.h"
 #import "MJRefresh.h"
 #import "XZDBOperation.h"
 #import "UITableView+FDTemplateLayoutCell.h"
+#import "XZDataLoader.h"
 
-@interface XZHomeViewController ()
+@interface XZHomeViewController()
 
-@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic) XZLogin *login;
 
 @end
 
 @implementation XZHomeViewController
 {
-    XZLogin *login;
-//    XZFeedsFrame *feedsFrame;
-    NSMutableArray *requestedHomeFeeds;
-    NSMutableArray *cachedHomeFeeds;
-    NSMutableArray *homeFeeds;
-    NSMutableDictionary *feedsResponse;
-    NSInteger pageNumber;
-    XZDBOperation *dbOp;
-    NSString *DBPath;
-    
-//    NSUInteger _sinceId; // 下拉刷新需要指定的参数，返回ID比sinceId（发布时间比sinceId晚）大的微博数据，默认为0
-//    NSUInteger _maxIdFromNetwork;  // 上拉刷新需要指定的参数，返回ID比maxId（发布时间比maxId早）小的微博数据，默认为0
-//    NSUInteger _maxIdFromCache;
+    NSMutableArray *_requestedHomeFeeds;
+    NSMutableArray *_cachedHomeFeeds;
+    NSMutableDictionary *_feedsResponse;
     NSUInteger _maxId;
+    NSMutableArray *_friendsTimelineIDs;
 }
 
 static NSString *identifier = @"FeedsCell";
@@ -47,31 +37,27 @@ static NSString *identifier = @"FeedsCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.tabBarController.delegate = self;
-    
-    login = [XZLogin sharedInstance];
-    homeFeeds = [NSMutableArray arrayWithCapacity:1];
-    requestedHomeFeeds = [NSMutableArray arrayWithCapacity:1];
 
-    pageNumber = 1;
-    
-    _maxId = 0;
-//    _maxIdFromCache = 0;
-//    _maxIdFromNetwork = 1; // 拉取小于或等于maxId的feeds，为了去掉等于而做的暂时兼容
-    
-    // 配置数据库相关操作
-    [self configureDB];
-    
     // 配置子视图
     [self configureSubviews];
     
-    // 加载数据
+    // 初始化实例变量
+    self.tabBarController.delegate = self;
+    self.tableView.fd_debugLogEnabled = NO;
+    _homeFeeds = [NSMutableArray arrayWithCapacity:1];
+    _requestedHomeFeeds = [NSMutableArray arrayWithCapacity:1];
+    _pageNumber = 1;
+    _maxId = 0;
+    
+//    [self getFriendsTimelineIDs];
+    
+    //加载数据
+    [self.dataLoader.dbOperation DBExistAtPath:self.dbPath]; // 没有DB则创建之
+    _maxId = [self.dataLoader.dbOperation dataExistInDB:self.dbPath]; // 如果DB中有数据，取出最新item的id，即maxId
+    
     [self loadData];
-    
-
-    
 }
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -81,7 +67,108 @@ static NSString *identifier = @"FeedsCell";
     NSLog(@"homeViewController dealloc");
 }
 
-#pragma mark - Configure when viewDidLoad
+#pragma mark - getter
+
+- (XZLogin *)login {
+    if (!_login) {
+        _login = [XZLogin sharedInstance];
+    }
+    return _login;
+}
+
+- (XZDataLoader *)dataLoader {
+    if (!_dataLoader) {
+        _dataLoader = [[XZDataLoader alloc]init];
+    }
+    return _dataLoader;
+}
+
+#pragma mark - Load data from network or cache
+
+- (NSString *)dbPath {
+    if (!_dbPath) {
+        NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cacheDirectory = [cachePaths objectAtIndex:0];
+        _dbPath = [cacheDirectory stringByAppendingPathComponent:@"weibo.db"];
+    }
+    return _dbPath;
+}
+
+//- (void)getFriendsTimelineIDs {
+//    [self.dataLoader requestFriendsTimelineIDsWithSinceId:0
+//                                                  orMaxId:1
+//                                             completion:^(BOOL success, NSArray *results) {
+//                                                   if (success == YES) {
+//                                                       _friendsTimelineIDs = [NSMutableArray arrayWithArray:results];
+//                                                   }
+//                                               }];
+//}
+
+- (void)loadData {
+    if (_maxId) { // 本地有缓存
+        [self loadFromLocalCache];
+    } else { // 本地无缓存
+        [self requestFromNetwork:1 withDeletingDB:NO];
+    }
+}
+
+// 从本地缓存加载数据
+- (void)loadFromLocalCache {
+    NSMutableArray *cacheFeeds = [NSMutableArray arrayWithArray:
+                                  [self.dataLoader loadCachedHomePageDataFromPath:self.dbPath
+                                                                        withMaxId:_maxId
+                                                                    andPageNumber:self.pageNumber
+                                   ]];
+    if ([cacheFeeds count]) { // 本地有缓存
+        NSLog(@"本地有缓存，加载");
+        XZStatus *status = cacheFeeds.lastObject;
+        _maxId = status.statusId;
+        NSLog(@"loadCache>>> maxId's changed to: %ld", (unsigned long)_maxId);
+        
+        [_homeFeeds addObjectsFromArray:cacheFeeds];
+        [self.tableView reloadData];
+        [self.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
+        [self.tableView.mj_header endRefreshing];
+    } else { // 本地缓存已经读取完毕，没有更多，网络加载
+        NSLog(@"本地无缓存，从网络拉取");
+        [self requestFromNetwork:_maxId withDeletingDB:NO];
+    }
+}
+
+// 从网络加载数据
+- (void)requestFromNetwork:(NSUInteger)MaxId withDeletingDB:(BOOL)delete {
+    NSLog(@"直接从网络拉取");
+    [self.dataLoader requestHomePageDataWithSinceId:0
+                                            orMaxId:MaxId
+                                         completion:^(BOOL success, NSArray *results, NSUInteger MaxIdChanded) {
+        if (success == YES) {
+            [_homeFeeds addObjectsFromArray:results];
+            
+            [self.tableView reloadData];
+            [self.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
+            [self.tableView.mj_header endRefreshing];
+            
+            _maxId = MaxIdChanded;
+            
+            // 清空DB中原有的数据，下拉刷新才需要
+            if (delete == YES) {
+                BOOL success= [self.dataLoader.dbOperation deleteFromDB:self.dbPath];
+                if (success) {
+                    NSLog(@"直接从网络拉取，清空数据库成功");
+                }
+            }
+            
+            // 请求成功要向DB写缓存
+            [self.dataLoader.dbOperation writeToDB:self.dbPath withData:results];
+        } else {
+            [self.tableView.mj_header endRefreshing];
+            [self.tableView.mj_footer endRefreshing];
+            _pageNumber -= 1;
+        }
+    }];
+}
+
+#pragma mark - Configure subviews
 
 - (void)configureSubviews {
     // 添加tableview
@@ -106,139 +193,28 @@ static NSString *identifier = @"FeedsCell";
     }];
 }
 
-- (void)configureDB {
-    dbOp = [[XZDBOperation alloc]init];
-    NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString *cacheDirectory = [cachePaths objectAtIndex:0];
-    DBPath = [cacheDirectory stringByAppendingPathComponent:@"weibo.db"];
-}
-
-- (void)loadData {
-    if (pageNumber == 1) { // 首次加载
-        [dbOp DBExistAtPath:DBPath]; // 没有DB则创建之
-        _maxId = [dbOp dataExistInDB:DBPath]; // 是否有数据，如果有取出最新item的id，即maxId
-    }
-    
-    if (_maxId) {
-        NSMutableArray *cacheFeeds = [NSMutableArray arrayWithArray:[self loadCachedHomePageDataWithMaxId:_maxId]];
-        if ([cacheFeeds count]) { // 本地有缓存
-            [homeFeeds addObjectsFromArray:cacheFeeds];
-            [self.tableView reloadData];
-            [self.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
-            [self.tableView.mj_header endRefreshing];
-        } else { // 本地缓存已经读取完毕，没有更多，网络加载
-            [self requestHomePageDataWithSinceId:0 orMaxId:_maxId];
-        }
-    } else { // 本地无缓存
-        [self requestHomePageDataWithSinceId:0 orMaxId:1];
-    }
-
-}
-
-// 下拉刷新触发
+// 下拉刷新触发，需要清空DB
 - (void)loadByDraggingDown {
-    pageNumber = 1;
-    [homeFeeds removeAllObjects];
-    [self requestHomePageDataWithSinceId:0 orMaxId:1];
+    _pageNumber = 1;
+    [_homeFeeds removeAllObjects];
+    [self requestFromNetwork:1 withDeletingDB:YES];
 }
 
-// 上拉刷新触发
+// 上拉刷新触发，不需要清空DB
 - (void)loadByDraggingUp {
-    pageNumber += 1;
+    _pageNumber += 1;
     [self loadData];
 }
 
-#pragma mark - Load data from local DB or network
-
-- (void)requestHomePageDataWithSinceId:(NSUInteger)sinceId orMaxId:(NSUInteger)maxId {
-    NSString *URLString = getFriendsTimeline;
-    NSDictionary *parameters = @{@"access_token": accessToken,
-                                 @"count": @FEEDS_COUNT,
-//                                 @"page": [NSNumber numberWithInteger:pageNumber],
-                                 @"since_id": [NSNumber numberWithInteger:sinceId],
-                                 @"max_id": [NSNumber numberWithInteger:maxId - 1]};
-    
-    NSMutableArray *requestFeeds = [NSMutableArray arrayWithCapacity:1];
-    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    [manager GET:URLString
-      parameters:parameters
-        progress:nil
-         success:^(NSURLSessionDataTask *task, id responseObject) {
-             
-             NSLog(@">>>Request Home Page Success");
-             NSArray *statuses = [responseObject objectForKey:@"statuses"];
-             NSInteger count = [statuses count];
-             
-             for (NSInteger i = 0; i < count; i++) {
-                 XZStatus *feeds = [[XZStatus alloc]init];
-                 feeds.statuses = statuses[i];
-                 [requestFeeds addObject:feeds];
-                 
-                 if (i == count - 1) {
-                     _maxId = feeds.statusId;
-                     NSLog(@"request>>> maxId‘s changed to: %ld", _maxId);
-                 }
-             }
-             
-             [homeFeeds addObjectsFromArray:requestFeeds];
-             
-             [self.tableView reloadData];
-             [self.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
-             [self.tableView.mj_header endRefreshing];
-             
-             // 请求成功要向DB写缓存
-             [dbOp writeToDB:DBPath withData:requestFeeds];
-            
-         }
-         failure:^(NSURLSessionDataTask *task, NSError *error) {
-             [self.tableView.mj_header endRefreshing];
-             [self.tableView.mj_footer endRefreshing];
-             NSLog(@">>>Request Home Page Error: %@",error);
-             pageNumber -= 1;
-         }
-     ];
-}
-
-- (NSArray *)loadCachedHomePageDataWithMaxId:(NSUInteger)maxId {
-    NSString *sql;
-    if (pageNumber == 1) {
-        sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE id <= %ld ORDER BY id DESC LIMIT %d", maxId, FEEDS_COUNT];
-    } else {
-        sql = [NSString stringWithFormat:@"SELECT * FROM status WHERE id < %ld ORDER BY id DESC LIMIT %d", maxId, FEEDS_COUNT];
-    }
-    NSLog(@"sql: %@", sql);
-    
-    cachedHomeFeeds = (NSMutableArray *)[dbOp fetchDataFromDB:DBPath usingSql:sql]; // 数组，内存字典
-    NSInteger count = MIN([cachedHomeFeeds count], FEEDS_COUNT); // 缓存数据可能不够一页
-    
-    if (count == 0) {
-        NSLog(@"本地无缓存");
-        return nil;
-    } else {
-        NSLog(@"本地有缓存, 加载");
-        NSMutableArray *caches = [NSMutableArray arrayWithCapacity:1];
-        for (NSInteger i = 0; i < count; i++) {
-            XZStatus *feeds = [[XZStatus alloc]init];
-            feeds.statuses = cachedHomeFeeds[i];
-            [caches addObject:feeds];
-            
-            if (i == count - 1) {
-                _maxId = feeds.statusId;
-                NSLog(@"cached>>> maxId's changed to: %ld", _maxId);
-            }
-        }
-        return caches;
-    }
-}
 
 #pragma mark - Table view datasource
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
 
-    if ([homeFeeds count] == FEEDS_COUNT * pageNumber) {
-        NSLog(@"current feed: %ld",indexPath.row);
-        cell.status = homeFeeds[indexPath.row];
+    if ([_homeFeeds count] == FEEDS_COUNT * _pageNumber) {
+        NSLog(@"current feed: %ld",(long)indexPath.row);
+        cell.status = _homeFeeds[indexPath.row];
         return cell;
     } else {
         return cell;
@@ -246,29 +222,29 @@ static NSString *identifier = @"FeedsCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-//    XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
-    
-    if ([homeFeeds count] == FEEDS_COUNT * pageNumber) {
-        CGFloat height = [tableView fd_heightForCellWithIdentifier:identifier configuration:^(XZFeedsCell *cell)
+    if ([_homeFeeds count] == FEEDS_COUNT * _pageNumber) {
+        CGFloat height = [tableView fd_heightForCellWithIdentifier:identifier cacheByIndexPath:indexPath configuration:^(XZFeedsCell *cell)
         {
-            cell.status = homeFeeds[indexPath.row];
+            cell.status = _homeFeeds[indexPath.row]; // 配置Cell的数据源，与cellForRowAtIndexPath干的事一致
         }];
-//        NSLog(@"caculated height: %f",height);
+//        CGFloat height = [tableView fd_heightForCellWithIdentifier:identifier configuration:^(XZFeedsCell *cell)
+//        {
+//          cell.status = homeFeeds[indexPath.row]; // 配置Cell的数据源，与cellForRowAtIndexPath干的事一致
+//        }];
         return height;
     } else {
         return 0;
     }
-    
 }
 
 - (void)configureCell:(XZFeedsCell *)cell atIndexPath:(NSIndexPath *)indexPath {
 //    cell.fd_enforceFrameLayout = NO; // Enable to use "-sizeThatFits:"
     
-    cell.status = homeFeeds[indexPath.row];
+    cell.status = _homeFeeds[indexPath.row];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSInteger count = FEEDS_COUNT * pageNumber;
+    NSInteger count = FEEDS_COUNT * _pageNumber;
     
     if (!count) { // count为0时隐藏footer，这里体验再优化下
         self.tableView.mj_footer.hidden = YES;

@@ -43,7 +43,7 @@
             return 0;
         } else {
             NSUInteger maxId = [s longForColumn:@"ID"];
-            NSLog(@"status表中有数据, maxId为: %ld", maxId);
+            NSLog(@"status表中有数据, maxId为: %ld", (unsigned long)maxId);
             [db close];
             return maxId;
         }
@@ -105,6 +105,29 @@
         NSLog(@"写DB——输入为空");
         return NO;
     }
+}
+
+// 清空db中的数据
+- (BOOL)deleteFromDB:(NSString *)DBPath {
+    FMDatabase *db = [FMDatabase databaseWithPath:DBPath];
+    if (![db open]) {
+        db = nil;
+        NSLog(@"清空DB——打开DB失败");
+        return NO;
+    }
+    
+    NSString *delete = @"DELETE FROM status";
+    if ([db executeUpdate:delete]) {
+        NSLog(@"清空DB——成功");
+        
+        [db close];
+        
+        return YES;
+    } else {
+        NSLog(@"清空DB——失败");
+        return NO;
+    }
+    
 }
 
 @end

@@ -11,6 +11,7 @@
 #import "XZSearchViewController.h"
 #import "XZProfileViewController.h"
 #import "XZLoginViewController.h"
+#import "XZPostViewController.h"
 #import "XZLogin.h"
 #import "WeiboSDK.h"
 #import "WeiboAPI.h"
@@ -57,9 +58,15 @@
     
     self.window.rootViewController = self.tabBarController;
     
+    // 初始化发微博入口
+    UIBarButtonItem *barItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(postFeeds)];
+    [homeViewController.navigationItem setTitle:@"Home"];
+    [homeViewController.navigationItem setRightBarButtonItem:barItem];
+    
     // 获取登录信息
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     BOOL isLogin = [userDefaults objectForKey:@"isLogin"];
+    
     // 登录过期逻辑待补充
     
     // 未登录显示登录页面
@@ -74,6 +81,14 @@
     [self.window makeKeyAndVisible];
     
     return YES;
+}
+
+- (void)postFeeds {
+    XZPostViewController *post = [[XZPostViewController alloc]init];
+    UINavigationController *navHome = self.window.rootViewController.childViewControllers[0];
+    XZHomeViewController *home = (XZHomeViewController *)navHome.topViewController;
+    [home presentViewController:post animated:NO completion:nil];
+    
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {

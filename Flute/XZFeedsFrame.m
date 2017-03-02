@@ -133,7 +133,7 @@
         // 被转发微博转发数
         CGFloat repostLabelX = baseX;
         CGFloat repostLabelY = baseY;
-        CGSize repostLabelSize = [self sizeWithString:[NSString stringWithFormat:@"转发(%ld) ",_feeds.retweetedRepostCounts]
+        CGSize repostLabelSize = [self sizeWithString:[NSString stringWithFormat:@"转发(%ld) ",(long)_feeds.retweetedRepostCounts]
                                                  font:FONT_13
                                               maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
         CGFloat repostLabelWidth = repostLabelSize.width;
@@ -143,7 +143,7 @@
         // 被转发微博评论数
         CGFloat commentLabelX = CGRectGetMaxX(self.repostCountsFrame);
         CGFloat commentLabelY = baseY;
-        CGSize commentLabelSize = [self sizeWithString:[NSString stringWithFormat:@"| 评论(%ld)",_feeds.retweetedCommentCounts]
+        CGSize commentLabelSize = [self sizeWithString:[NSString stringWithFormat:@"| 评论(%ld)",(long)_feeds.retweetedCommentCounts]
                                                   font:FONT_13
                                                maxSize:CGSizeMake(WIDTH - 5 - PADDING_TEN * 3 - iconViewWidth, MAXFLOAT)];
         CGFloat commentLabelWidth = commentLabelSize.width;

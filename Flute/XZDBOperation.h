@@ -22,6 +22,7 @@
 // 向DB中存储数据
 - (BOOL)writeToDB:(NSString *)DBPath withData:(NSArray *)data;
 
-
+// 删除DB中全部数据
+- (BOOL)deleteFromDB:(NSString *)DBPath;
 
 @end

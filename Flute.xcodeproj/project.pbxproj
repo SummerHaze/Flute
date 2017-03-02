@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		162EFA6D1E5EB9F5007EA6C9 /* XZPostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 162EFA6C1E5EB9F5007EA6C9 /* XZPostViewController.m */; };
+		162EFA731E5EF229007EA6C9 /* XZStatusUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 162EFA721E5EF229007EA6C9 /* XZStatusUploader.m */; };
+		162EFA761E5F32DA007EA6C9 /* XZMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */; };
+		162EFA781E5F34C5007EA6C9 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162EFA771E5F34C5007EA6C9 /* MapKit.framework */; };
 		167EA7A81E0BD39500453562 /* libMJRefresh.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 167EA7A71E0BD39500453562 /* libMJRefresh.a */; };
 		167EA7AA1E0D3C4500453562 /* weibo.db in Resources */ = {isa = PBXBuildFile; fileRef = 167EA7A91E0D3C4500453562 /* weibo.db */; };
 		167EA7AC1E0D55A700453562 /* libMasonry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 167EA7AB1E0D55A700453562 /* libMasonry.a */; };
@@ -39,6 +43,7 @@
 		16827E6F1E03D2E4002BDFAB /* XZStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E6E1E03D2E4002BDFAB /* XZStatus.m */; };
 		16827E721E03D3A2002BDFAB /* XZFeedsFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */; };
 		16827E831E06DA56002BDFAB /* XZDBOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E821E06DA56002BDFAB /* XZDBOperation.m */; };
+		16F3B9C91E5C20C5003BB866 /* XZDataLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16F3B9C81E5C20C5003BB866 /* XZDataLoader.m */; };
 		65258566402E0FAF3C483121 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3601800D6EA3FF2E2E5E18A /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +58,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		162EFA6B1E5EB9F5007EA6C9 /* XZPostViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZPostViewController.h; sourceTree = "<group>"; };
+		162EFA6C1E5EB9F5007EA6C9 /* XZPostViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZPostViewController.m; sourceTree = "<group>"; };
+		162EFA711E5EF229007EA6C9 /* XZStatusUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZStatusUploader.h; sourceTree = "<group>"; };
+		162EFA721E5EF229007EA6C9 /* XZStatusUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZStatusUploader.m; sourceTree = "<group>"; };
+		162EFA741E5F32DA007EA6C9 /* XZMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZMapViewController.h; sourceTree = "<group>"; };
+		162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZMapViewController.m; sourceTree = "<group>"; };
+		162EFA771E5F34C5007EA6C9 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		167EA7A71E0BD39500453562 /* libMJRefresh.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMJRefresh.a; path = "../../../Library/Developer/Xcode/DerivedData/Flute-cevfrmsesqpcqpgkkrgcsrpepfwk/Build/Products/Debug-iphoneos/libMJRefresh.a"; sourceTree = "<group>"; };
 		167EA7A91E0D3C4500453562 /* weibo.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = weibo.db; sourceTree = SOURCE_ROOT; };
 		167EA7AB1E0D55A700453562 /* libMasonry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMasonry.a; path = "../../../Library/Developer/Xcode/DerivedData/Flute-cevfrmsesqpcqpgkkrgcsrpepfwk/Build/Products/Debug-iphoneos/libMasonry.a"; sourceTree = "<group>"; };
@@ -113,6 +125,8 @@
 		16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZFeedsFrame.m; sourceTree = "<group>"; };
 		16827E811E06DA56002BDFAB /* XZDBOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZDBOperation.h; sourceTree = "<group>"; };
 		16827E821E06DA56002BDFAB /* XZDBOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZDBOperation.m; sourceTree = "<group>"; };
+		16F3B9C71E5C20C5003BB866 /* XZDataLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZDataLoader.h; sourceTree = "<group>"; };
+		16F3B9C81E5C20C5003BB866 /* XZDataLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZDataLoader.m; sourceTree = "<group>"; };
 		677E396470DE842CB8156A24 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		DBAF8684DCD479BA66C5A0EE /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		F3601800D6EA3FF2E2E5E18A /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -127,6 +141,7 @@
 				167EA7AC1E0D55A700453562 /* libMasonry.a in Frameworks */,
 				167EA7A81E0BD39500453562 /* libMJRefresh.a in Frameworks */,
 				16827E581E02CD81002BDFAB /* libAFNetworking.a in Frameworks */,
+				162EFA781E5F34C5007EA6C9 /* MapKit.framework in Frameworks */,
 				16827E521E029504002BDFAB /* libWeiboSDK.a in Frameworks */,
 				16827E501E028F8C002BDFAB /* libsqlite3.tbd in Frameworks */,
 				16827E4E1E028F7C002BDFAB /* libz.tbd in Frameworks */,
@@ -184,6 +199,10 @@
 				16827DF61E0254CD002BDFAB /* AppDelegate.m */,
 				16827E171E025F07002BDFAB /* XZHomeViewController.h */,
 				16827E181E025F07002BDFAB /* XZHomeViewController.m */,
+				162EFA6B1E5EB9F5007EA6C9 /* XZPostViewController.h */,
+				162EFA6C1E5EB9F5007EA6C9 /* XZPostViewController.m */,
+				162EFA741E5F32DA007EA6C9 /* XZMapViewController.h */,
+				162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */,
 				16827E1A1E026238002BDFAB /* XZSearchViewController.h */,
 				16827E1B1E026238002BDFAB /* XZSearchViewController.m */,
 				16827E271E028D64002BDFAB /* XZProfileViewController.h */,
@@ -225,6 +244,10 @@
 				16827E6E1E03D2E4002BDFAB /* XZStatus.m */,
 				16827E241E0268CC002BDFAB /* XZLogin.h */,
 				16827E251E0268CC002BDFAB /* XZLogin.m */,
+				16F3B9C71E5C20C5003BB866 /* XZDataLoader.h */,
+				16F3B9C81E5C20C5003BB866 /* XZDataLoader.m */,
+				162EFA711E5EF229007EA6C9 /* XZStatusUploader.h */,
+				162EFA721E5EF229007EA6C9 /* XZStatusUploader.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -253,6 +276,7 @@
 		16827E3A1E028F0E002BDFAB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				162EFA771E5F34C5007EA6C9 /* MapKit.framework */,
 				167EA7AD1E0D55AA00453562 /* libFMDB.a */,
 				167EA7AB1E0D55A700453562 /* libMasonry.a */,
 				167EA7A71E0BD39500453562 /* libMJRefresh.a */,
@@ -357,6 +381,11 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = NBT8RMV8WY;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					16827E071E0254CE002BDFAB = {
 						CreatedOnToolsVersion = 8.1;
@@ -461,15 +490,19 @@
 			files = (
 				16827DF71E0254CD002BDFAB /* AppDelegate.m in Sources */,
 				16827E721E03D3A2002BDFAB /* XZFeedsFrame.m in Sources */,
+				162EFA6D1E5EB9F5007EA6C9 /* XZPostViewController.m in Sources */,
 				16827E831E06DA56002BDFAB /* XZDBOperation.m in Sources */,
 				16827DF41E0254CD002BDFAB /* main.m in Sources */,
+				16F3B9C91E5C20C5003BB866 /* XZDataLoader.m in Sources */,
 				16827E6C1E039638002BDFAB /* XZFeedsCell.m in Sources */,
 				16827E291E028D64002BDFAB /* XZProfileViewController.m in Sources */,
 				16827E6F1E03D2E4002BDFAB /* XZStatus.m in Sources */,
 				16827E221E0266CF002BDFAB /* XZLoginViewController.m in Sources */,
 				16827E261E0268CC002BDFAB /* XZLogin.m in Sources */,
+				162EFA761E5F32DA007EA6C9 /* XZMapViewController.m in Sources */,
 				16827E1C1E026238002BDFAB /* XZSearchViewController.m in Sources */,
 				16827E191E025F07002BDFAB /* XZHomeViewController.m in Sources */,
+				162EFA731E5EF229007EA6C9 /* XZStatusUploader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

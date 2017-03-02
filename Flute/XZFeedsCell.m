@@ -11,6 +11,7 @@
 #import "XZStatus.h"
 #import "WeiboAPI.h"
 #import "Masonry.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 
 @implementation XZFeedsCell
 
@@ -99,10 +100,13 @@ static NSString *identifier = @"FeedsCell";
 }
 
 - (void)configureData:(XZStatus *)status {
-    NSURL *url = [NSURL URLWithString:status.icon];
-    NSData *data = [NSData dataWithContentsOfURL:url];
+//    NSURL *url = [NSURL URLWithString:status.icon];
+//    NSData *data = [NSData dataWithContentsOfURL:url];
+//    self.iconView.image = [UIImage imageWithData:data];
     
-    self.iconView.image = [UIImage imageWithData:data];
+    [self.iconView sd_setImageWithURL:[NSURL URLWithString:status.icon]
+                     placeholderImage:nil];
+    
     self.nameLabel.text = status.name;
     
     // 已经在frame上判断过，这里是否可以不重复判断？不确定先这样写着。
@@ -113,12 +117,16 @@ static NSString *identifier = @"FeedsCell";
     // 原微博
     if (status.thumbnailPic != nil) {
         if ([status.picURLs count] == 1) { // 只有一张配图
-            NSString *urlString = [NSString stringWithFormat:@"%@", status.thumbnailPic];
-            NSURL *url = [NSURL URLWithString:urlString];
-            NSData *data = [NSData dataWithContentsOfURL:url];
+//            NSString *urlString = [NSString stringWithFormat:@"%@", status.thumbnailPic];
+//            NSURL *url = [NSURL URLWithString:urlString];
+//            NSData *data = [NSData dataWithContentsOfURL:url];
+//            
+//            UIImageView *imageView = self.picViews[0];
+//            [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
             
             UIImageView *imageView = self.picViews[0];
-            [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
+            [imageView sd_setImageWithURL:[NSURL URLWithString:status.thumbnailPic]
+                             placeholderImage:nil];
             
             for (int i = 8; i > 2; i--) {
                 [self.picViews removeLastObject];
@@ -126,12 +134,16 @@ static NSString *identifier = @"FeedsCell";
         } else { // 多张配图
             NSInteger count = [status.picURLs count];
             for (int i = 0; i < count; i++) {
-                NSString *urlString = [NSString stringWithFormat:@"%@", status.picURLs[i]];
-                NSURL *url = [NSURL URLWithString:urlString];
-                NSData *data = [NSData dataWithContentsOfURL:url];
+//                NSString *urlString = [NSString stringWithFormat:@"%@", status.picURLs[i]];
+//                NSURL *url = [NSURL URLWithString:urlString];
+//                NSData *data = [NSData dataWithContentsOfURL:url];
+//                UIImageView *imageView = self.picViews[i];
+//                [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
                 
                 UIImageView *imageView = self.picViews[i];
-                [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
+                [imageView sd_setImageWithURL:[NSURL URLWithString:status.picURLs[i]]
+                             placeholderImage:nil];
+               
             }
             
             count = ceil(count / 3.0) * 3;
@@ -153,12 +165,16 @@ static NSString *identifier = @"FeedsCell";
         self.commentLabel.text = [NSString stringWithFormat:@"| 评论(%ld)",(long)status.retweetedCommentCounts];
         if (status.retweetedThumbnailPic != nil) {
             if ([status.retweetedPicURLs count]== 1) { // 只有一张配图
-                NSString *urlString = [NSString stringWithFormat:@"%@", status.retweetedThumbnailPic];
-                NSURL *url = [NSURL URLWithString:urlString];
-                NSData *data = [NSData dataWithContentsOfURL:url];
+//                NSString *urlString = [NSString stringWithFormat:@"%@", status.retweetedThumbnailPic];
+//                NSURL *url = [NSURL URLWithString:urlString];
+//                NSData *data = [NSData dataWithContentsOfURL:url];
+//                
+//                UIImageView *imageView = self.repostPicViews[0];
+//                [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
                 
                 UIImageView *imageView = self.repostPicViews[0];
-                [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
+                [imageView sd_setImageWithURL:[NSURL URLWithString:status.retweetedThumbnailPic]
+                             placeholderImage:nil];
                 
                 for (int i = 8; i > 2; i--) {
                     [self.repostPicViews removeLastObject];
@@ -167,12 +183,16 @@ static NSString *identifier = @"FeedsCell";
                 NSInteger count = [status.retweetedPicURLs count];
                 
                 for (int i = 0; i < count; i++) {
-                    NSString *urlString = [NSString stringWithFormat:@"%@", status.retweetedPicURLs[i]];
-                    NSURL *url = [NSURL URLWithString:urlString];
-                    NSData *data = [NSData dataWithContentsOfURL:url];
+//                    NSString *urlString = [NSString stringWithFormat:@"%@", status.retweetedPicURLs[i]];
+//                    NSURL *url = [NSURL URLWithString:urlString];
+//                    NSData *data = [NSData dataWithContentsOfURL:url];
+//                    
+//                    UIImageView *imageView = self.repostPicViews[i];
+//                    [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
                     
                     UIImageView *imageView = self.repostPicViews[i];
-                    [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
+                    [imageView sd_setImageWithURL:[NSURL URLWithString:status.retweetedPicURLs[i]]
+                                 placeholderImage:nil];
                 }
                 
                 count = ceil(count / 3.0) * 3;
