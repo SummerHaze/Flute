@@ -19,17 +19,17 @@
     // Do any additional setup after loading the view.
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    // 隐藏该页面的navigation Bar
-    [self.navigationController setNavigationBarHidden:YES animated:NO];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    // 该页面触发的子页面依然显示navigationBar
-    [self.navigationController setNavigationBarHidden:NO animated:NO];
-}
+//- (void)viewWillAppear:(BOOL)animated {
+//    [super viewWillAppear:animated];
+//    // 隐藏该页面的navigation Bar
+//    [self.navigationController setNavigationBarHidden:YES animated:NO];
+//}
+//
+//- (void)viewWillDisappear:(BOOL)animated {
+//    [super viewWillDisappear:animated];
+//    // 该页面触发的子页面依然显示navigationBar
+//    [self.navigationController setNavigationBarHidden:NO animated:NO];
+//}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

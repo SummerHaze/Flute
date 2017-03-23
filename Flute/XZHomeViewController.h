@@ -7,15 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "XZDataLoader.h"
-#import "UITableView+FDTemplateLayoutCell.h"
+#import "XZFeedsViewController.h"
 
-@interface XZHomeViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, UITabBarControllerDelegate, UIScrollViewDelegate>
-
-@property (nonatomic) XZDataLoader *dataLoader;
-@property (nonatomic) UITableView *tableView;
-@property (nonatomic) NSMutableArray *homeFeeds;
-@property (nonatomic, assign) NSInteger pageNumber;
-@property (nonatomic) NSString *dbPath;
+@interface XZHomeViewController : XZFeedsViewController
 
 @end

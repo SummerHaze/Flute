@@ -10,19 +10,20 @@
 
 @interface XZDBOperation : NSObject
 
-// 判断DBPath目录下是否有weibo.db，没有则创建
-- (void)DBExistAtPath:(NSString *)DBPath;
+// 判断DBPath目录下是否有对应DB，没有则创建
+- (void)DBExistAtPath:(NSString *)DBPath name:(NSString *)DBName;
 
-// 判断DB中是否有数据
-- (NSUInteger)dataExistInDB:(NSString *)DBPath;
+// 判断DB指定table中是否有数据
+- (NSUInteger)dataExistInDB:(NSString *)DBPath andTable:(NSString *)table;
 
-// 从DB中取出制定条数的数据
+// 从DB中取出指定条数的数据
 - (NSArray *)fetchDataFromDB:(NSString *)DBPath usingSql:(NSString *)sql;
 
 // 向DB中存储数据
-- (BOOL)writeToDB:(NSString *)DBPath withData:(NSArray *)data;
+- (BOOL)writeUserTimelineToDB:(NSString *)DBPath withData:(NSArray *)data;
+- (BOOL)writeFriendsTimelineToDB:(NSString *)DBPath withData:(NSArray *)data;
 
-// 删除DB中全部数据
-- (BOOL)deleteFromDB:(NSString *)DBPath;
+// 删除DB指定table中全部数据
+- (BOOL)deleteFromDB:(NSString *)DBPath table:(NSString *)table;
 
 @end

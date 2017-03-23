@@ -10,6 +10,7 @@
 #import "XZLogin.h"
 #import "XZHomeViewController.h"
 #import "UITableView+FDTemplateLayoutCell.h"
+#import "XZStatus.h"
 
 @interface XZLoginViewController ()
 
@@ -87,16 +88,26 @@
         UITabBarController *tabBarController = (UITabBarController *)self.view.superview.nextResponder;
         UINavigationController *navigationController = tabBarController.childViewControllers[0];
         XZHomeViewController *homeViewController = (XZHomeViewController *)navigationController.topViewController;
-        [homeViewController.dataLoader requestHomePageDataWithSinceId:0 orMaxId:0 completion:^(BOOL success, NSArray *results, NSUInteger maxId) {
+        [homeViewController.dataLoader requestFriendsTimelineWithSinceId:0  orMaxId:0 completion:^(BOOL success, id responseObject) {
             if (success == YES) {
-                [homeViewController.homeFeeds addObjectsFromArray:results];
+                NSMutableArray *results = [NSMutableArray arrayWithCapacity:1];
+                NSArray *statuses = [responseObject objectForKey:@"statuses"];
                 
-                [homeViewController.tableView reloadData];
+                // 处理responseObject
+                for (NSInteger i = 0; i < [statuses count]; i++) {
+                    XZStatus *feeds = [[XZStatus alloc]init];
+                    feeds.statuses = statuses[i];
+                    [results addObject:feeds];
+                }
+                
+                [homeViewController.feeds addObjectsFromArray:results];
+                
+//                [homeViewController.tableView reloadData];
 //                [homeViewController.tableView.mj_footer endRefreshing]; // 隐藏刷新控件
 //                [homeViewController.tableView.mj_header endRefreshing];
                 
                 // 请求成功要向DB写缓存
-                [homeViewController.dataLoader.dbOperation writeToDB:homeViewController.dbPath withData:results];
+                [homeViewController.dataLoader.dbOperation writeFriendsTimelineToDB:homeViewController.dbPath withData:results];
             } else {
 //                [homeViewController.tableView.mj_header endRefreshing];
 //                [homeViewController.tableView.mj_footer endRefreshing];

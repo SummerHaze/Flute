@@ -11,8 +11,9 @@
 		162EFA731E5EF229007EA6C9 /* XZStatusUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 162EFA721E5EF229007EA6C9 /* XZStatusUploader.m */; };
 		162EFA761E5F32DA007EA6C9 /* XZMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */; };
 		162EFA781E5F34C5007EA6C9 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 162EFA771E5F34C5007EA6C9 /* MapKit.framework */; };
+		163DB4DA1E7D71160072422E /* libWeiboSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 163DB4CD1E7D71160072422E /* libWeiboSDK.a */; };
+		163DB4DB1E7D71160072422E /* WeiboSDK.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 163DB4D71E7D71160072422E /* WeiboSDK.bundle */; };
 		167EA7A81E0BD39500453562 /* libMJRefresh.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 167EA7A71E0BD39500453562 /* libMJRefresh.a */; };
-		167EA7AA1E0D3C4500453562 /* weibo.db in Resources */ = {isa = PBXBuildFile; fileRef = 167EA7A91E0D3C4500453562 /* weibo.db */; };
 		167EA7AC1E0D55A700453562 /* libMasonry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 167EA7AB1E0D55A700453562 /* libMasonry.a */; };
 		167EA7AE1E0D55AA00453562 /* libFMDB.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 167EA7AD1E0D55AA00453562 /* libFMDB.a */; };
 		16827DF41E0254CD002BDFAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827DF31E0254CD002BDFAB /* main.m */; };
@@ -25,7 +26,6 @@
 		16827E221E0266CF002BDFAB /* XZLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E211E0266CF002BDFAB /* XZLoginViewController.m */; };
 		16827E261E0268CC002BDFAB /* XZLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E251E0268CC002BDFAB /* XZLogin.m */; };
 		16827E291E028D64002BDFAB /* XZProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E281E028D64002BDFAB /* XZProfileViewController.m */; };
-		16827E391E028E62002BDFAB /* WeiboSDK.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 16827E351E028E62002BDFAB /* WeiboSDK.bundle */; };
 		16827E3C1E028F0E002BDFAB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16827E3B1E028F0E002BDFAB /* QuartzCore.framework */; };
 		16827E3E1E028F20002BDFAB /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16827E3D1E028F20002BDFAB /* ImageIO.framework */; };
 		16827E401E028F29002BDFAB /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16827E3F1E028F29002BDFAB /* SystemConfiguration.framework */; };
@@ -43,6 +43,13 @@
 		16827E6F1E03D2E4002BDFAB /* XZStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E6E1E03D2E4002BDFAB /* XZStatus.m */; };
 		16827E721E03D3A2002BDFAB /* XZFeedsFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */; };
 		16827E831E06DA56002BDFAB /* XZDBOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E821E06DA56002BDFAB /* XZDBOperation.m */; };
+		16D739431E82BBD600C10014 /* weibo.db in Resources */ = {isa = PBXBuildFile; fileRef = 16D739421E82BBD600C10014 /* weibo.db */; };
+		16E4899C1E7E7F7A00CB543B /* XZUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */; };
+		16E4899F1E7E7F8B00CB543B /* XZTopicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E4899E1E7E7F8B00CB543B /* XZTopicViewController.m */; };
+		16E489A21E7EDA2E00CB543B /* XZUserInfoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E489A11E7EDA2E00CB543B /* XZUserInfoView.m */; };
+		16E489A51E7FC6BC00CB543B /* XZUserProfile.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E489A41E7FC6BC00CB543B /* XZUserProfile.m */; };
+		16E489C01E80FB6500CB543B /* XZUserView.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E489BF1E80FB6500CB543B /* XZUserView.m */; };
+		16E489C31E822FBA00CB543B /* XZFeedsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E489C21E822FBA00CB543B /* XZFeedsViewController.m */; };
 		16F3B9C91E5C20C5003BB866 /* XZDataLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 16F3B9C81E5C20C5003BB866 /* XZDataLoader.m */; };
 		65258566402E0FAF3C483121 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F3601800D6EA3FF2E2E5E18A /* libPods.a */; };
 /* End PBXBuildFile section */
@@ -65,8 +72,20 @@
 		162EFA741E5F32DA007EA6C9 /* XZMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZMapViewController.h; sourceTree = "<group>"; };
 		162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZMapViewController.m; sourceTree = "<group>"; };
 		162EFA771E5F34C5007EA6C9 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		163DB4CD1E7D71160072422E /* libWeiboSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWeiboSDK.a; sourceTree = "<group>"; };
+		163DB4CE1E7D71160072422E /* WBHttpRequest+WeiboGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboGame.h"; sourceTree = "<group>"; };
+		163DB4CF1E7D71160072422E /* WBHttpRequest+WeiboShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboShare.h"; sourceTree = "<group>"; };
+		163DB4D01E7D71160072422E /* WBHttpRequest+WeiboToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboToken.h"; sourceTree = "<group>"; };
+		163DB4D11E7D71160072422E /* WBHttpRequest+WeiboUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboUser.h"; sourceTree = "<group>"; };
+		163DB4D21E7D71160072422E /* WBHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBHttpRequest.h; sourceTree = "<group>"; };
+		163DB4D31E7D71160072422E /* WBSDKBasicButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBSDKBasicButton.h; sourceTree = "<group>"; };
+		163DB4D41E7D71160072422E /* WBSDKCommentButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBSDKCommentButton.h; sourceTree = "<group>"; };
+		163DB4D51E7D71160072422E /* WBSDKRelationshipButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBSDKRelationshipButton.h; sourceTree = "<group>"; };
+		163DB4D61E7D71160072422E /* WeiboSDK+Statistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WeiboSDK+Statistics.h"; sourceTree = "<group>"; };
+		163DB4D71E7D71160072422E /* WeiboSDK.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = WeiboSDK.bundle; sourceTree = "<group>"; };
+		163DB4D81E7D71160072422E /* WeiboSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeiboSDK.h; sourceTree = "<group>"; };
+		163DB4D91E7D71160072422E /* WeiboUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeiboUser.h; sourceTree = "<group>"; };
 		167EA7A71E0BD39500453562 /* libMJRefresh.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMJRefresh.a; path = "../../../Library/Developer/Xcode/DerivedData/Flute-cevfrmsesqpcqpgkkrgcsrpepfwk/Build/Products/Debug-iphoneos/libMJRefresh.a"; sourceTree = "<group>"; };
-		167EA7A91E0D3C4500453562 /* weibo.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = weibo.db; sourceTree = SOURCE_ROOT; };
 		167EA7AB1E0D55A700453562 /* libMasonry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMasonry.a; path = "../../../Library/Developer/Xcode/DerivedData/Flute-cevfrmsesqpcqpgkkrgcsrpepfwk/Build/Products/Debug-iphoneos/libMasonry.a"; sourceTree = "<group>"; };
 		167EA7AD1E0D55AA00453562 /* libFMDB.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libFMDB.a; path = "../../../Library/Developer/Xcode/DerivedData/Flute-cevfrmsesqpcqpgkkrgcsrpepfwk/Build/Products/Debug-iphoneos/libFMDB.a"; sourceTree = "<group>"; };
 		16827DEF1E0254CD002BDFAB /* Flute.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Flute.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -89,19 +108,6 @@
 		16827E251E0268CC002BDFAB /* XZLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZLogin.m; sourceTree = "<group>"; };
 		16827E271E028D64002BDFAB /* XZProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZProfileViewController.h; sourceTree = "<group>"; };
 		16827E281E028D64002BDFAB /* XZProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZProfileViewController.m; sourceTree = "<group>"; };
-		16827E2B1E028E62002BDFAB /* libWeiboSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libWeiboSDK.a; sourceTree = "<group>"; };
-		16827E2C1E028E62002BDFAB /* WBHttpRequest+WeiboGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboGame.h"; sourceTree = "<group>"; };
-		16827E2D1E028E62002BDFAB /* WBHttpRequest+WeiboShare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboShare.h"; sourceTree = "<group>"; };
-		16827E2E1E028E62002BDFAB /* WBHttpRequest+WeiboToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboToken.h"; sourceTree = "<group>"; };
-		16827E2F1E028E62002BDFAB /* WBHttpRequest+WeiboUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WBHttpRequest+WeiboUser.h"; sourceTree = "<group>"; };
-		16827E301E028E62002BDFAB /* WBHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBHttpRequest.h; sourceTree = "<group>"; };
-		16827E311E028E62002BDFAB /* WBSDKBasicButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBSDKBasicButton.h; sourceTree = "<group>"; };
-		16827E321E028E62002BDFAB /* WBSDKCommentButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBSDKCommentButton.h; sourceTree = "<group>"; };
-		16827E331E028E62002BDFAB /* WBSDKRelationshipButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBSDKRelationshipButton.h; sourceTree = "<group>"; };
-		16827E341E028E62002BDFAB /* WeiboSDK+Statistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "WeiboSDK+Statistics.h"; sourceTree = "<group>"; };
-		16827E351E028E62002BDFAB /* WeiboSDK.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = WeiboSDK.bundle; sourceTree = "<group>"; };
-		16827E361E028E62002BDFAB /* WeiboSDK.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeiboSDK.h; sourceTree = "<group>"; };
-		16827E371E028E62002BDFAB /* WeiboUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeiboUser.h; sourceTree = "<group>"; };
 		16827E3B1E028F0E002BDFAB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		16827E3D1E028F20002BDFAB /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		16827E3F1E028F29002BDFAB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -125,6 +131,19 @@
 		16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZFeedsFrame.m; sourceTree = "<group>"; };
 		16827E811E06DA56002BDFAB /* XZDBOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZDBOperation.h; sourceTree = "<group>"; };
 		16827E821E06DA56002BDFAB /* XZDBOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZDBOperation.m; sourceTree = "<group>"; };
+		16D739421E82BBD600C10014 /* weibo.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = weibo.db; sourceTree = SOURCE_ROOT; };
+		16E4899A1E7E7F7A00CB543B /* XZUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZUserViewController.h; sourceTree = "<group>"; };
+		16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZUserViewController.m; sourceTree = "<group>"; };
+		16E4899D1E7E7F8B00CB543B /* XZTopicViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZTopicViewController.h; sourceTree = "<group>"; };
+		16E4899E1E7E7F8B00CB543B /* XZTopicViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZTopicViewController.m; sourceTree = "<group>"; };
+		16E489A01E7EDA2E00CB543B /* XZUserInfoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZUserInfoView.h; sourceTree = "<group>"; };
+		16E489A11E7EDA2E00CB543B /* XZUserInfoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZUserInfoView.m; sourceTree = "<group>"; };
+		16E489A31E7FC6BC00CB543B /* XZUserProfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZUserProfile.h; sourceTree = "<group>"; };
+		16E489A41E7FC6BC00CB543B /* XZUserProfile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZUserProfile.m; sourceTree = "<group>"; };
+		16E489BE1E80FB6500CB543B /* XZUserView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZUserView.h; sourceTree = "<group>"; };
+		16E489BF1E80FB6500CB543B /* XZUserView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZUserView.m; sourceTree = "<group>"; };
+		16E489C11E822FBA00CB543B /* XZFeedsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZFeedsViewController.h; sourceTree = "<group>"; };
+		16E489C21E822FBA00CB543B /* XZFeedsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZFeedsViewController.m; sourceTree = "<group>"; };
 		16F3B9C71E5C20C5003BB866 /* XZDataLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZDataLoader.h; sourceTree = "<group>"; };
 		16F3B9C81E5C20C5003BB866 /* XZDataLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZDataLoader.m; sourceTree = "<group>"; };
 		677E396470DE842CB8156A24 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
@@ -147,6 +166,7 @@
 				16827E4E1E028F7C002BDFAB /* libz.tbd in Frameworks */,
 				16827E4C1E028F6B002BDFAB /* CoreGraphics.framework in Frameworks */,
 				16827E4A1E028F61002BDFAB /* Foundation.framework in Frameworks */,
+				163DB4DA1E7D71160072422E /* libWeiboSDK.a in Frameworks */,
 				16827E481E028F53002BDFAB /* UIKit.framework in Frameworks */,
 				16827E461E028F49002BDFAB /* CoreText.framework in Frameworks */,
 				16827E441E028F3F002BDFAB /* CoreTelephony.framework in Frameworks */,
@@ -168,10 +188,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		163DB4CC1E7D71160072422E /* libWeiboSDK */ = {
+			isa = PBXGroup;
+			children = (
+				163DB4CD1E7D71160072422E /* libWeiboSDK.a */,
+				163DB4CE1E7D71160072422E /* WBHttpRequest+WeiboGame.h */,
+				163DB4CF1E7D71160072422E /* WBHttpRequest+WeiboShare.h */,
+				163DB4D01E7D71160072422E /* WBHttpRequest+WeiboToken.h */,
+				163DB4D11E7D71160072422E /* WBHttpRequest+WeiboUser.h */,
+				163DB4D21E7D71160072422E /* WBHttpRequest.h */,
+				163DB4D31E7D71160072422E /* WBSDKBasicButton.h */,
+				163DB4D41E7D71160072422E /* WBSDKCommentButton.h */,
+				163DB4D51E7D71160072422E /* WBSDKRelationshipButton.h */,
+				163DB4D61E7D71160072422E /* WeiboSDK+Statistics.h */,
+				163DB4D71E7D71160072422E /* WeiboSDK.bundle */,
+				163DB4D81E7D71160072422E /* WeiboSDK.h */,
+				163DB4D91E7D71160072422E /* WeiboUser.h */,
+			);
+			path = libWeiboSDK;
+			sourceTree = "<group>";
+		};
 		16827DE61E0254CD002BDFAB = {
 			isa = PBXGroup;
 			children = (
-				16827E2A1E028E62002BDFAB /* libWeiboSDK */,
+				163DB4CC1E7D71160072422E /* libWeiboSDK */,
 				16827DF11E0254CD002BDFAB /* Flute */,
 				16827E0B1E0254CE002BDFAB /* FluteTests */,
 				16827DF01E0254CD002BDFAB /* Products */,
@@ -197,8 +237,14 @@
 				16827E231E0268B3002BDFAB /* Model */,
 				16827DF51E0254CD002BDFAB /* AppDelegate.h */,
 				16827DF61E0254CD002BDFAB /* AppDelegate.m */,
+				16E489C11E822FBA00CB543B /* XZFeedsViewController.h */,
+				16E489C21E822FBA00CB543B /* XZFeedsViewController.m */,
 				16827E171E025F07002BDFAB /* XZHomeViewController.h */,
 				16827E181E025F07002BDFAB /* XZHomeViewController.m */,
+				16E4899A1E7E7F7A00CB543B /* XZUserViewController.h */,
+				16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */,
+				16E4899D1E7E7F8B00CB543B /* XZTopicViewController.h */,
+				16E4899E1E7E7F8B00CB543B /* XZTopicViewController.m */,
 				162EFA6B1E5EB9F5007EA6C9 /* XZPostViewController.h */,
 				162EFA6C1E5EB9F5007EA6C9 /* XZPostViewController.m */,
 				162EFA741E5F32DA007EA6C9 /* XZMapViewController.h */,
@@ -217,7 +263,7 @@
 		16827DF21E0254CD002BDFAB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				167EA7A91E0D3C4500453562 /* weibo.db */,
+				16D739421E82BBD600C10014 /* weibo.db */,
 				16827E531E02C3E0002BDFAB /* Singleton.h */,
 				16827E561E02C8B5002BDFAB /* WeiboAPI.h */,
 				16827DFE1E0254CD002BDFAB /* Assets.xcassets */,
@@ -248,29 +294,10 @@
 				16F3B9C81E5C20C5003BB866 /* XZDataLoader.m */,
 				162EFA711E5EF229007EA6C9 /* XZStatusUploader.h */,
 				162EFA721E5EF229007EA6C9 /* XZStatusUploader.m */,
+				16E489A31E7FC6BC00CB543B /* XZUserProfile.h */,
+				16E489A41E7FC6BC00CB543B /* XZUserProfile.m */,
 			);
 			name = Model;
-			sourceTree = "<group>";
-		};
-		16827E2A1E028E62002BDFAB /* libWeiboSDK */ = {
-			isa = PBXGroup;
-			children = (
-				16827E2B1E028E62002BDFAB /* libWeiboSDK.a */,
-				16827E2C1E028E62002BDFAB /* WBHttpRequest+WeiboGame.h */,
-				16827E2D1E028E62002BDFAB /* WBHttpRequest+WeiboShare.h */,
-				16827E2E1E028E62002BDFAB /* WBHttpRequest+WeiboToken.h */,
-				16827E2F1E028E62002BDFAB /* WBHttpRequest+WeiboUser.h */,
-				16827E301E028E62002BDFAB /* WBHttpRequest.h */,
-				16827E311E028E62002BDFAB /* WBSDKBasicButton.h */,
-				16827E321E028E62002BDFAB /* WBSDKCommentButton.h */,
-				16827E331E028E62002BDFAB /* WBSDKRelationshipButton.h */,
-				16827E341E028E62002BDFAB /* WeiboSDK+Statistics.h */,
-				16827E351E028E62002BDFAB /* WeiboSDK.bundle */,
-				16827E361E028E62002BDFAB /* WeiboSDK.h */,
-				16827E371E028E62002BDFAB /* WeiboUser.h */,
-			);
-			name = libWeiboSDK;
-			path = "../../../Downloads/weibo_ios_sdk-master/libWeiboSDK";
 			sourceTree = "<group>";
 		};
 		16827E3A1E028F0E002BDFAB /* Frameworks */ = {
@@ -305,6 +332,10 @@
 				16827E6B1E039638002BDFAB /* XZFeedsCell.m */,
 				16827E701E03D3A2002BDFAB /* XZFeedsFrame.h */,
 				16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */,
+				16E489A01E7EDA2E00CB543B /* XZUserInfoView.h */,
+				16E489A11E7EDA2E00CB543B /* XZUserInfoView.m */,
+				16E489BE1E80FB6500CB543B /* XZUserView.h */,
+				16E489BF1E80FB6500CB543B /* XZUserView.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -421,8 +452,8 @@
 			files = (
 				16827E021E0254CD002BDFAB /* LaunchScreen.storyboard in Resources */,
 				16827DFF1E0254CD002BDFAB /* Assets.xcassets in Resources */,
-				167EA7AA1E0D3C4500453562 /* weibo.db in Resources */,
-				16827E391E028E62002BDFAB /* WeiboSDK.bundle in Resources */,
+				16D739431E82BBD600C10014 /* weibo.db in Resources */,
+				163DB4DB1E7D71160072422E /* WeiboSDK.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +520,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				16827DF71E0254CD002BDFAB /* AppDelegate.m in Sources */,
+				16E489A21E7EDA2E00CB543B /* XZUserInfoView.m in Sources */,
+				16E489A51E7FC6BC00CB543B /* XZUserProfile.m in Sources */,
+				16E4899C1E7E7F7A00CB543B /* XZUserViewController.m in Sources */,
 				16827E721E03D3A2002BDFAB /* XZFeedsFrame.m in Sources */,
 				162EFA6D1E5EB9F5007EA6C9 /* XZPostViewController.m in Sources */,
 				16827E831E06DA56002BDFAB /* XZDBOperation.m in Sources */,
@@ -496,9 +530,12 @@
 				16F3B9C91E5C20C5003BB866 /* XZDataLoader.m in Sources */,
 				16827E6C1E039638002BDFAB /* XZFeedsCell.m in Sources */,
 				16827E291E028D64002BDFAB /* XZProfileViewController.m in Sources */,
+				16E4899F1E7E7F8B00CB543B /* XZTopicViewController.m in Sources */,
 				16827E6F1E03D2E4002BDFAB /* XZStatus.m in Sources */,
+				16E489C31E822FBA00CB543B /* XZFeedsViewController.m in Sources */,
 				16827E221E0266CF002BDFAB /* XZLoginViewController.m in Sources */,
 				16827E261E0268CC002BDFAB /* XZLogin.m in Sources */,
+				16E489C01E80FB6500CB543B /* XZUserView.m in Sources */,
 				162EFA761E5F32DA007EA6C9 /* XZMapViewController.m in Sources */,
 				16827E1C1E026238002BDFAB /* XZSearchViewController.m in Sources */,
 				16827E191E025F07002BDFAB /* XZHomeViewController.m in Sources */,

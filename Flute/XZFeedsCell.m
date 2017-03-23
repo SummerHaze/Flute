@@ -11,20 +11,47 @@
 #import "XZStatus.h"
 #import "WeiboAPI.h"
 #import "Masonry.h"
+#import "TTTAttributedLabel.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 
 @implementation XZFeedsCell
 
 static NSString *identifier = @"FeedsCell";
 
+static inline NSRegularExpression * UserRegularExpression() {
+    static NSRegularExpression *_userRegularExpression = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _userRegularExpression = [[NSRegularExpression alloc]
+                                  initWithPattern:@"@([\u4e00-\u9fa5]|[0-9]|[a-zA-Z]|_|-)+"
+                                  options:NSRegularExpressionCaseInsensitive
+                                  error:nil]; // 用户昵称只支持汉字、中英文、数字、下划线、中划线
+    });
+    
+    return _userRegularExpression;
+}
+
+static inline NSRegularExpression * TopicRegularExpression() {
+    static NSRegularExpression *_topicRegularExpression = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _topicRegularExpression = [[NSRegularExpression alloc]
+                                   initWithPattern:@"#[^#]+#" // 注意规避#xx##yy#这种话题情况
+                                   options:NSRegularExpressionCaseInsensitive
+                                   error:nil]; // 话题以#开头并结尾
+    });
+    
+    return _topicRegularExpression;
+}
+
 // 初始化cell
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        return self;
-    } else {
+    if (!self) {
         return nil;
     }
+//    [self configureSubViews];
+    return self;
 }
 
 #pragma mark - Setter
@@ -34,6 +61,15 @@ static NSString *identifier = @"FeedsCell";
     [self configureData:status];
     [self configureConstraints:status];
 }
+
+//- (void)drawRect:(CGRect)rect {
+//    [super drawRect:rect];
+//}
+//
+//- (void)layoutSubviews {
+//    [super layoutSubviews];
+//    [self configureConstraints:self.status];
+//}
 
 // 添加子控件
 - (void)configureSubViews {
@@ -48,8 +84,9 @@ static NSString *identifier = @"FeedsCell";
     [self.contentView addSubview:self.nameLabel];
     
     // 正文
-    self.contentLabel = [[UILabel alloc]init];
+    self.contentLabel = [[TTTAttributedLabel alloc] initWithFrame:CGRectZero];
     self.contentLabel.numberOfLines = 0;
+    self.contentLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.contentLabel.font = FONT_13;
     [self.contentView addSubview:self.contentLabel];
     
@@ -73,8 +110,9 @@ static NSString *identifier = @"FeedsCell";
     [self.repostBackgroundView addSubview:self.repostNameLabel];
     
     // 被转发的原博原文
-    self.repostTextLabel = [[UILabel alloc]init];
+    self.repostTextLabel = [[TTTAttributedLabel alloc] initWithFrame:CGRectZero];
     self.repostTextLabel.numberOfLines = 0;
+    self.repostTextLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.repostTextLabel.font = FONT_13;
     [self.repostBackgroundView addSubview:self.repostTextLabel];
     
@@ -100,10 +138,6 @@ static NSString *identifier = @"FeedsCell";
 }
 
 - (void)configureData:(XZStatus *)status {
-//    NSURL *url = [NSURL URLWithString:status.icon];
-//    NSData *data = [NSData dataWithContentsOfURL:url];
-//    self.iconView.image = [UIImage imageWithData:data];
-    
     [self.iconView sd_setImageWithURL:[NSURL URLWithString:status.icon]
                      placeholderImage:nil];
     
@@ -111,19 +145,12 @@ static NSString *identifier = @"FeedsCell";
     
     // 已经在frame上判断过，这里是否可以不重复判断？不确定先这样写着。
     if (status.text != nil) {
-        self.contentLabel.text = status.text;
+        [self transformFromString:status.text inLabel:self.contentLabel];
     }
     
     // 原微博
     if (status.thumbnailPic != nil) {
         if ([status.picURLs count] == 1) { // 只有一张配图
-//            NSString *urlString = [NSString stringWithFormat:@"%@", status.thumbnailPic];
-//            NSURL *url = [NSURL URLWithString:urlString];
-//            NSData *data = [NSData dataWithContentsOfURL:url];
-//            
-//            UIImageView *imageView = self.picViews[0];
-//            [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
-            
             UIImageView *imageView = self.picViews[0];
             [imageView sd_setImageWithURL:[NSURL URLWithString:status.thumbnailPic]
                              placeholderImage:nil];
@@ -134,16 +161,9 @@ static NSString *identifier = @"FeedsCell";
         } else { // 多张配图
             NSInteger count = [status.picURLs count];
             for (int i = 0; i < count; i++) {
-//                NSString *urlString = [NSString stringWithFormat:@"%@", status.picURLs[i]];
-//                NSURL *url = [NSURL URLWithString:urlString];
-//                NSData *data = [NSData dataWithContentsOfURL:url];
-//                UIImageView *imageView = self.picViews[i];
-//                [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
-                
                 UIImageView *imageView = self.picViews[i];
                 [imageView sd_setImageWithURL:[NSURL URLWithString:status.picURLs[i]]
                              placeholderImage:nil];
-               
             }
             
             count = ceil(count / 3.0) * 3;
@@ -160,18 +180,12 @@ static NSString *identifier = @"FeedsCell";
     // 被转发微博
     if (status.retweetedStatuses != nil) {
         self.repostNameLabel.text = [NSString stringWithFormat:@"%@ :", status.retweetedName];
-        self.repostTextLabel.text = status.retweetedText;
+//        self.repostTextLabel.text = status.retweetedText;
+        [self transformFromString:status.retweetedText inLabel:self.repostTextLabel];
         self.repostLabel.text = [NSString stringWithFormat:@"转发(%ld) ",(long)status.retweetedRepostCounts];
         self.commentLabel.text = [NSString stringWithFormat:@"| 评论(%ld)",(long)status.retweetedCommentCounts];
         if (status.retweetedThumbnailPic != nil) {
             if ([status.retweetedPicURLs count]== 1) { // 只有一张配图
-//                NSString *urlString = [NSString stringWithFormat:@"%@", status.retweetedThumbnailPic];
-//                NSURL *url = [NSURL URLWithString:urlString];
-//                NSData *data = [NSData dataWithContentsOfURL:url];
-//                
-//                UIImageView *imageView = self.repostPicViews[0];
-//                [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
-                
                 UIImageView *imageView = self.repostPicViews[0];
                 [imageView sd_setImageWithURL:[NSURL URLWithString:status.retweetedThumbnailPic]
                              placeholderImage:nil];
@@ -183,13 +197,6 @@ static NSString *identifier = @"FeedsCell";
                 NSInteger count = [status.retweetedPicURLs count];
                 
                 for (int i = 0; i < count; i++) {
-//                    NSString *urlString = [NSString stringWithFormat:@"%@", status.retweetedPicURLs[i]];
-//                    NSURL *url = [NSURL URLWithString:urlString];
-//                    NSData *data = [NSData dataWithContentsOfURL:url];
-//                    
-//                    UIImageView *imageView = self.repostPicViews[i];
-//                    [imageView setImage:[UIImage imageWithData:data]]; // 给每张imageView设置图片数据
-                    
                     UIImageView *imageView = self.repostPicViews[i];
                     [imageView sd_setImageWithURL:[NSURL URLWithString:status.retweetedPicURLs[i]]
                                  placeholderImage:nil];
@@ -209,6 +216,50 @@ static NSString *identifier = @"FeedsCell";
         [self.repostBackgroundView removeFromSuperview];
     }
 }
+
+
+// 标识text中的@用户和#话题
+- (void)transformFromString:(NSString *)str inLabel:(TTTAttributedLabel *)label{
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc]initWithString:str];
+    NSRegularExpression *topicRegular = TopicRegularExpression();
+    NSRegularExpression *userRegular = UserRegularExpression();
+    
+    // 使用正则匹配目标字符串，所匹配到的结果存入array
+    NSArray *topicMatches = [topicRegular matchesInString:str
+                                                  options:0
+                                                    range:NSMakeRange(0, [str length])];
+    NSArray *userMatches = [userRegular matchesInString:str
+                                                options:0
+                                                  range:NSMakeRange(0, [str length])];
+
+    // 遍历结果
+    for(NSTextCheckingResult *match in topicMatches) {
+        NSRange range = [match range];
+        [attrStr addAttribute:NSForegroundColorAttributeName value:[UIColor greenColor] range:range];
+    }
+
+    for(NSTextCheckingResult *match in userMatches) {
+        NSRange range = [match range];
+        [attrStr addAttribute:NSForegroundColorAttributeName value:[UIColor blueColor] range:range];
+//        NSString *mStr = [str substringWithRange:range];
+//        NSLog(@"%@", mStr);
+    }
+    
+    // 要先设置text，再addLink，点击效果才能正常生效
+    [label setText:attrStr];
+    
+    // 遍历结果
+    for(NSTextCheckingResult *match in topicMatches) {
+        [label addLinkWithTextCheckingResult:match];
+    }
+    
+    for(NSTextCheckingResult *match in userMatches) {
+//        NSRange range = [match range];
+//        NSURL *url = [NSURL URLWithString:[str substringWithRange:range]];
+        [label addLinkWithTextCheckingResult:match];
+    }
+}
+
 
 // 为各子控件添加约束
 - (void)configureConstraints:(XZStatus *)status {
@@ -230,6 +281,7 @@ static NSString *identifier = @"FeedsCell";
     // 正文
     // 手动设置label的文字的最大宽度(目的:为了能够计算label的高度,得到最真实的尺寸)
     self.contentLabel.preferredMaxLayoutWidth = [UIScreen mainScreen].bounds.size.width - 30 - 3 * PADDING_TEN;
+    
     CGSize contentSize = [self sizeWithString:self.contentLabel.text
                                          font:FONT_13
                                       maxSize:CGSizeMake(self.contentLabel.preferredMaxLayoutWidth,MAXFLOAT)];
@@ -299,14 +351,12 @@ static NSString *identifier = @"FeedsCell";
         [self.repostLabel mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(self.repostBackgroundView.mas_left).offset(PADDING_FIVE);
             make.top.equalTo(self.repostTextLabel.mas_bottom).offset(PADDING_FIVE);
-    //        make.bottom.equalTo(self.repostBackgroundView.mas_bottom).offset(-PADDING_FIVE);
         }];
         
         // 被转发的原博评论数添加约束
         [self.commentLabel mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(self.repostLabel.mas_right).offset(PADDING_FIVE);
             make.top.equalTo(self.repostLabel.mas_top);
-    //        make.bottom.equalTo(self.repostBackgroundView.mas_bottom).offset(-PADDING_FIVE);
         }];
         
         // 被转发的原博配图
@@ -427,9 +477,17 @@ static NSString *identifier = @"FeedsCell";
  @param maxSize 最大范围
  @return 文本占用的实际高度
  */
-- (CGSize)sizeWithString:(NSString *)str font:(UIFont *)font maxSize:(CGSize)maxSize {
+- (CGSize)sizeWithString:(NSMutableAttributedString *)str font:(UIFont *)font maxSize:(CGSize)maxSize {
     NSDictionary *dict = @{NSFontAttributeName: font};
-    CGSize size = [str boundingRectWithSize:maxSize
+    NSString *innerStr;
+    
+    if ([str isKindOfClass:NSMutableAttributedString.class]) {
+        innerStr = [str string];
+    } else {
+        innerStr = (NSString *)str;
+    }
+    
+    CGSize size = [innerStr boundingRectWithSize:maxSize
                                     options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
                                  attributes:dict
                                     context:nil].size;

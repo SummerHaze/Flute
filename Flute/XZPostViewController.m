@@ -65,26 +65,35 @@
     }];
 }
 
+// 纯代码构建navigationBar
 - (void)configureNavigationBar {
+    // 初始化navigationBar
     CGRect screenRect = [[UIScreen mainScreen] bounds];
     UINavigationBar *navigationBar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 20, screenRect.size.width, 44)];
     
-    //创建UINavigationItem
+    //创建UINavigationItem，并制定标题
     UINavigationItem *item = [[UINavigationItem alloc] initWithTitle:@"Editing"];
+    
+    // 将标题item添加到navigationBar上
     [navigationBar pushNavigationItem: item animated:YES];
+    
+    // 将navigationBar添加到self.view上
     [self.view addSubview: navigationBar];
     
-    //创建UIBarButton 可根据需要选择适合自己的样式
+    //创建左侧的取消UIBarButtonItem
     UIBarButtonItem *leftButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+    
+    // 创建右侧的完成UIBarButtonItem
     self.rightButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(done)];
     self.rightButtonItem.enabled = NO;
     
-    [item setTitle:@"Editing"];
+    // 将两个button，添加到item上
     [item setLeftBarButtonItem:leftButtonItem];
     [item setRightBarButtonItem:self.rightButtonItem];
-
-    [navigationBar setItems:[NSArray arrayWithObject: item]];
+    
+    
 }
+
 
 - (void)configureSubviews {
     CGRect screenRect = [[UIScreen mainScreen] bounds];
