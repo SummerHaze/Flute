@@ -8,11 +8,8 @@
 
 #import "XZUserViewController.h"
 #import "XZUserInfoView.h"
-#import "Masonry.h"
 #import "WeiboAPI.h"
-#import "XZFeedsCell.h"
 #import "XZUserView.h"
-#import "XZDataLoader.h"
 #import "XZUserProfile.h"
 #import "XZStatus.h"
 #import "UITableView+FDTemplateLayoutCell.h"
@@ -21,6 +18,8 @@ static NSString *identifier = @"FeedsCell";
 static NSString *userName = @"sumha201";
 
 @implementation XZUserViewController
+
+#pragma mark - Life cycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -31,11 +30,8 @@ static NSString *userName = @"sumha201";
     self.navigationItem.title = self.selectedUserName;
     self.view.backgroundColor = [UIColor whiteColor];
     
-    self.userView = [[XZUserView alloc]initWithFrame:CGRectMake(0, 64, kScreenWidth, HEIGHT + 30)];
     self.feedsTableView.tableHeaderView = self.userView;
-    
     self.userView.userInfoView.delegate = self;
-    [self.userView.pageControl addTarget:self action:@selector(pageControlChanged:) forControlEvents:UIControlEventValueChanged];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -58,6 +54,8 @@ static NSString *userName = @"sumha201";
     }];
 }
 
+#pragma mark - Event response
+
 // pageControl变更时，滑动UIScrollView到对应页面
 - (void)pageControlChanged:(UIPageControl *)sender {
     int page = (int)sender.currentPage;
@@ -65,6 +63,7 @@ static NSString *userName = @"sumha201";
 }
 
 #pragma mark - UIScrolView delegate
+
 // UIScrollView滑动时，变更对应的pageControl
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     NSInteger page = scrollView.contentOffset.x / CGRectGetWidth(self.userView.userInfoView.frame);
@@ -74,5 +73,14 @@ static NSString *userName = @"sumha201";
     }
 }
 
+#pragma mark - getters and setters
+
+- (XZUserView *)userView {
+    if (!_userView) {
+        _userView = [[XZUserView alloc]initWithFrame:CGRectMake(0, 64, kScreenWidth, HEIGHT + 30)];
+        [_userView.pageControl addTarget:self action:@selector(pageControlChanged:) forControlEvents:UIControlEventValueChanged];
+    }
+    return _userView;
+}
 
 @end

@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-//#import "TTTAttributedLabel.h"
 
-//@class XZFeedsFrame;
 @class XZStatus;
 @class TTTAttributedLabel;
+
+extern NSMutableArray *XZImageUrls;
 
 @interface XZFeedsCell : UITableViewCell
 
@@ -31,6 +31,5 @@
 
 //@property (nonatomic, strong) XZFeedsFrame *feedsFrame;         // frame model
 @property (nonatomic, strong) XZStatus *status;
-
 
 @end

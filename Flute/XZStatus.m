@@ -25,7 +25,8 @@
 
 // 微博正文
 - (NSString *)text {
-    return [self.statuses objectForKey:@"text"];
+    NSString *text = [self.statuses objectForKey:@"text"];
+    return text;
 }
 
 // 正文配图地址
@@ -108,6 +109,5 @@
     NSNumber *comment = [self.retweetedStatuses objectForKey:@"comments_count"];
     return comment.integerValue;
 }
-
 
 @end

@@ -13,10 +13,16 @@
 #import "Masonry.h"
 #import "TTTAttributedLabel.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "XZImageView.h"
+#import "UIImage+ClipToSquare.h"
 
 @implementation XZFeedsCell
 
 static NSString *identifier = @"FeedsCell";
+static NSString *thumb = @"thumbnail";
+static NSString *middle = @"bmiddle";
+
+NSMutableArray *XZImageUrls; // 保存每个cell中的imageurl。原微博和转发微博中，不会同时显示图片
 
 static inline NSRegularExpression * UserRegularExpression() {
     static NSRegularExpression *_userRegularExpression = nil;
@@ -54,14 +60,6 @@ static inline NSRegularExpression * TopicRegularExpression() {
     return self;
 }
 
-#pragma mark - Setter
-// 为各个子控件赋值，并根据不同数据源隐藏多余的控件
-- (void)setStatus:(XZStatus *)status {
-    [self configureSubViews];
-    [self configureData:status];
-    [self configureConstraints:status];
-}
-
 //- (void)drawRect:(CGRect)rect {
 //    [super drawRect:rect];
 //}
@@ -81,19 +79,22 @@ static inline NSRegularExpression * TopicRegularExpression() {
     self.nameLabel = [[UILabel alloc]init];
     self.nameLabel.numberOfLines = 0;
     self.nameLabel.font = FONT_13;
+//    self.nameLabel.backgroundColor = [UIColor redColor];
     [self.contentView addSubview:self.nameLabel];
     
     // 正文
     self.contentLabel = [[TTTAttributedLabel alloc] initWithFrame:CGRectZero];
     self.contentLabel.numberOfLines = 0;
-    self.contentLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    self.contentLabel.lineBreakMode = NSLineBreakByWordWrapping; // numbersOfLines属性设置对TTTAttributedString的几种Truncating lineBreakMode无效
     self.contentLabel.font = FONT_13;
+//    self.contentLabel.backgroundColor = [UIColor greenColor];
+    self.contentLabel.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
     [self.contentView addSubview:self.contentLabel];
     
     // 配图
     self.picViews = [NSMutableArray arrayWithCapacity:1];
     for (int i = 0; i < 9; i++) {
-        UIImageView *imageView = [[UIImageView alloc]init];
+        XZImageView *imageView = [[XZImageView alloc]init];
         [self.contentView addSubview:imageView];
         [self.picViews addObject:imageView];
     }
@@ -131,15 +132,21 @@ static inline NSRegularExpression * TopicRegularExpression() {
     // 被转发的原博配图
     self.repostPicViews = [NSMutableArray arrayWithCapacity:1];
     for (int i = 0; i < 9; i++) {
-        UIImageView *imageView = [[UIImageView alloc]init];
+        XZImageView *imageView = [[XZImageView alloc]init];
         [self.repostBackgroundView addSubview:imageView];
         [self.repostPicViews addObject:imageView];
     }
 }
 
 - (void)configureData:(XZStatus *)status {
+    NSMutableArray *cellUrls = [[NSMutableArray alloc]initWithCapacity:1];
+    
+    if (!XZImageUrls) {
+        XZImageUrls = [[NSMutableArray alloc]initWithCapacity:1];
+    }
+    
     [self.iconView sd_setImageWithURL:[NSURL URLWithString:status.icon]
-                     placeholderImage:nil];
+                     placeholderImage:[UIImage imageNamed:@"loading"]];
     
     self.nameLabel.text = status.name;
     
@@ -151,9 +158,15 @@ static inline NSRegularExpression * TopicRegularExpression() {
     // 原微博
     if (status.thumbnailPic != nil) {
         if ([status.picURLs count] == 1) { // 只有一张配图
-            UIImageView *imageView = self.picViews[0];
-            [imageView sd_setImageWithURL:[NSURL URLWithString:status.thumbnailPic]
-                             placeholderImage:nil];
+            XZImageView *imageView = self.picViews[0];
+            NSURL *url = [self replace:status.thumbnailPic occurrenceOfString:thumb withString:middle];
+            [cellUrls addObject:url];
+            
+            [imageView sd_setImageWithURL:url
+                         placeholderImage:[UIImage imageNamed:@"loading"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                            UIImage *clipImage = [UIImage clipToSquareOfImage:image];
+                            [imageView setImage:clipImage];
+                         }];
             
             for (int i = 8; i > 2; i--) {
                 [self.picViews removeLastObject];
@@ -161,9 +174,15 @@ static inline NSRegularExpression * TopicRegularExpression() {
         } else { // 多张配图
             NSInteger count = [status.picURLs count];
             for (int i = 0; i < count; i++) {
-                UIImageView *imageView = self.picViews[i];
-                [imageView sd_setImageWithURL:[NSURL URLWithString:status.picURLs[i]]
-                             placeholderImage:nil];
+                XZImageView *imageView = self.picViews[i];
+                NSURL *url = [self replace:status.picURLs[i] occurrenceOfString:thumb withString:middle];
+                [cellUrls addObject:url];
+                
+                [imageView sd_setImageWithURL:url
+                             placeholderImage:[UIImage imageNamed:@"loading"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                                 UIImage *clipImage = [UIImage clipToSquareOfImage:image];
+                                 [imageView setImage:clipImage];
+                             }];
             }
             
             count = ceil(count / 3.0) * 3;
@@ -180,15 +199,20 @@ static inline NSRegularExpression * TopicRegularExpression() {
     // 被转发微博
     if (status.retweetedStatuses != nil) {
         self.repostNameLabel.text = [NSString stringWithFormat:@"%@ :", status.retweetedName];
-//        self.repostTextLabel.text = status.retweetedText;
         [self transformFromString:status.retweetedText inLabel:self.repostTextLabel];
         self.repostLabel.text = [NSString stringWithFormat:@"转发(%ld) ",(long)status.retweetedRepostCounts];
         self.commentLabel.text = [NSString stringWithFormat:@"| 评论(%ld)",(long)status.retweetedCommentCounts];
         if (status.retweetedThumbnailPic != nil) {
             if ([status.retweetedPicURLs count]== 1) { // 只有一张配图
-                UIImageView *imageView = self.repostPicViews[0];
-                [imageView sd_setImageWithURL:[NSURL URLWithString:status.retweetedThumbnailPic]
-                             placeholderImage:nil];
+                XZImageView *imageView = self.repostPicViews[0];
+                NSURL *url = [self replace:status.retweetedThumbnailPic occurrenceOfString:thumb withString:middle];
+                [cellUrls addObject:url];
+                
+                [imageView sd_setImageWithURL:url
+                             placeholderImage:[UIImage imageNamed:@"loading"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                                 UIImage *clipImage = [UIImage clipToSquareOfImage:image];
+                                 [imageView setImage:clipImage];
+                             }];
                 
                 for (int i = 8; i > 2; i--) {
                     [self.repostPicViews removeLastObject];
@@ -197,9 +221,15 @@ static inline NSRegularExpression * TopicRegularExpression() {
                 NSInteger count = [status.retweetedPicURLs count];
                 
                 for (int i = 0; i < count; i++) {
-                    UIImageView *imageView = self.repostPicViews[i];
-                    [imageView sd_setImageWithURL:[NSURL URLWithString:status.retweetedPicURLs[i]]
-                                 placeholderImage:nil];
+                    XZImageView *imageView = self.repostPicViews[i];
+                    NSURL *url = [self replace:status.retweetedPicURLs[i] occurrenceOfString:thumb withString:middle];
+                    [cellUrls addObject:url];
+                    
+                    [imageView sd_setImageWithURL:url
+                                 placeholderImage:[UIImage imageNamed:@"loading"] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+                                     UIImage *clipImage = [UIImage clipToSquareOfImage:image];
+                                     [imageView setImage:clipImage];
+                                 }];
                 }
                 
                 count = ceil(count / 3.0) * 3;
@@ -215,6 +245,8 @@ static inline NSRegularExpression * TopicRegularExpression() {
     } else { // 没有转发微博
         [self.repostBackgroundView removeFromSuperview];
     }
+    
+    [XZImageUrls addObject: cellUrls]; // 每个cell中的图片url数组，作为一个元素，存储到imageUrls中
 }
 
 
@@ -263,6 +295,7 @@ static inline NSRegularExpression * TopicRegularExpression() {
 
 // 为各子控件添加约束
 - (void)configureConstraints:(XZStatus *)status {
+    
     // 头像添加约束
     [self.iconView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.contentView.mas_left).offset(PADDING_TEN);
@@ -276,21 +309,28 @@ static inline NSRegularExpression * TopicRegularExpression() {
         make.left.equalTo(self.iconView.mas_right).offset(PADDING_TEN);
         make.top.equalTo(self.iconView.mas_top);
         make.right.equalTo(self.contentView.mas_right).offset(-PADDING_TEN);
+        make.height.equalTo(@20);
     }];
     
     // 正文
     // 手动设置label的文字的最大宽度(目的:为了能够计算label的高度,得到最真实的尺寸)
     self.contentLabel.preferredMaxLayoutWidth = [UIScreen mainScreen].bounds.size.width - 30 - 3 * PADDING_TEN;
+
+//    // 方法1，不确定为什么显示文字有个别被截断的现象
+//    CGSize contentSize = [self sizeWithString:self.contentLabel.text
+//                                         font:FONT_13
+//                                      maxSize:CGSizeMake(self.contentLabel.preferredMaxLayoutWidth,MAXFLOAT)];
     
-    CGSize contentSize = [self sizeWithString:self.contentLabel.text
-                                         font:FONT_13
-                                      maxSize:CGSizeMake(self.contentLabel.preferredMaxLayoutWidth,MAXFLOAT)];
+    // 方法2，可行
+    CGSize contentSize = [self.contentLabel sizeThatFits:CGSizeMake(self.contentLabel.preferredMaxLayoutWidth, MAXFLOAT)];
+    CGFloat height = ceil(contentSize.height) + 1;
+    
     // 约束
     [self.contentLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.nameLabel.mas_left);
-        make.top.equalTo(self.nameLabel.mas_bottom).offset(PADDING_FIVE);
-        make.right.equalTo(self.contentView).offset(-PADDING_TEN);
-        make.height.equalTo([NSNumber numberWithFloat:contentSize.height]);
+        make.top.equalTo(self.nameLabel.mas_bottom);
+        make.right.equalTo(self.contentView.mas_right).offset(-PADDING_TEN);
+        make.height.equalTo([NSNumber numberWithFloat:height]);
     }];
     
     // 配图
@@ -311,7 +351,7 @@ static inline NSRegularExpression * TopicRegularExpression() {
         }
     } else { // 有转发其他微博
         if ([self.picViews count]) { // 正文有配图
-            UIImageView *imageView = self.picViews.lastObject;
+            XZImageView *imageView = self.picViews.lastObject;
             [self.repostBackgroundView mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.left.equalTo(self.contentLabel.mas_left);
                 make.top.equalTo(imageView.mas_bottom).offset(PADDING_FIVE);
@@ -374,26 +414,25 @@ static inline NSRegularExpression * TopicRegularExpression() {
     
     NSInteger count = [picImageViews count];
 
-    UIImageView *imageView0 = picImageViews[0];
-    UIImageView *imageView1 = picImageViews[1];
-    UIImageView *imageView2 = picImageViews[2];
+    XZImageView *imageView0 = picImageViews[0];
+    XZImageView *imageView1 = picImageViews[1];
+    XZImageView *imageView2 = picImageViews[2];
     
     [imageView0 mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(allignView.mas_left); // 首行首个左侧，与转发label左侧、第2行／第3行首个元素左侧对齐
-        make.top.equalTo(allignView.mas_bottom).offset(PADDING_FIVE); // 首行首个顶部，与转发label底部，间隔PADDING_FIVE
-        make.top.equalTo(@[imageView1.mas_top, imageView2.mas_top]); // 首行首个顶部，与首行第2个／第3个顶部对齐
-        make.height.equalTo(imageView0.mas_width);
-        make.height.equalTo(@[imageView1.mas_height, imageView2.mas_height]);
-        make.width.equalTo(@[imageView1.mas_width, imageView2.mas_width]); // 所有view等高等宽
+        make.top.equalTo(allignView.mas_bottom).offset(PADDING_FIVE); // 首行首个顶部，与转发label底部，间隔
+        make.top.equalTo(@[imageView1, imageView2]); // 首行首个顶部，与首行第2个／第3个顶部对齐
+        make.height.equalTo(@[imageView0.mas_width, imageView1, imageView2]);
+        make.width.equalTo(@[imageView1, imageView2]); // 所有view等高等宽
     }];
     
     [imageView1 mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(imageView0.mas_right).offset(PADDING_FIVE); // 首行第2个左侧，与首行第1个右侧，间隔PADDING_FIVE
+        make.left.equalTo(imageView0.mas_right).offset(PADDING_FIVE); // 首行第2个左侧，与首行第1个右侧，间隔
     }];
     
     [imageView2 mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(imageView1.mas_right).offset(PADDING_FIVE); // 首行第3个左侧，与首行第2个右侧，间隔PADDING_FIVE
-        make.right.equalTo(backgroundView.mas_right).offset(-PADDING_FIVE); // 首行第3个右侧，与backgroundView的右侧，间隔－PADDING_FIVE
+        make.left.equalTo(imageView1.mas_right).offset(PADDING_FIVE); // 首行第3个左侧，与首行第2个右侧，间隔
+        make.right.equalTo(backgroundView).offset(-PADDING_FIVE); // 首行第3个右侧，与backgroundView的右侧，间隔
     }];
     
     if (count == 3) {
@@ -403,9 +442,9 @@ static inline NSRegularExpression * TopicRegularExpression() {
     }
     
     if (count >= 6) {
-        UIImageView *imageView3 = picImageViews[3];
-        UIImageView *imageView4 = picImageViews[4];
-        UIImageView *imageView5 = picImageViews[5];
+        XZImageView *imageView3 = picImageViews[3];
+        XZImageView *imageView4 = picImageViews[4];
+        XZImageView *imageView5 = picImageViews[5];
         
         [imageView3 mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(imageView0); // 首行首个左侧，与转发label左侧、第2行／第3行首个元素左侧对齐
@@ -416,11 +455,11 @@ static inline NSRegularExpression * TopicRegularExpression() {
         }];
         
         [imageView4 mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.equalTo(imageView1.mas_left);
+            make.left.equalTo(imageView1);
         }];
         
         [imageView5 mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.equalTo(imageView2.mas_left);
+            make.left.equalTo(imageView2);
             make.right.equalTo(backgroundView.mas_right).offset(-PADDING_FIVE); // 首行第3个右侧，与backgroundView的右侧，间隔－PADDING_FIVE
         }];
         
@@ -431,9 +470,9 @@ static inline NSRegularExpression * TopicRegularExpression() {
         }
         
         if (count == 9) {
-            UIImageView *imageView6 = picImageViews[6];
-            UIImageView *imageView7 = picImageViews[7];
-            UIImageView *imageView8 = picImageViews[8];
+            XZImageView *imageView6 = picImageViews[6];
+            XZImageView *imageView7 = picImageViews[7];
+            XZImageView *imageView8 = picImageViews[8];
             
             [imageView6 mas_makeConstraints:^(MASConstraintMaker *make) {
                 make.left.equalTo(imageView0); // 首行首个左侧，与转发label左侧、第2行／第3行首个元素左侧对齐
@@ -444,12 +483,12 @@ static inline NSRegularExpression * TopicRegularExpression() {
             }];
             
             [imageView7 mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(imageView1.mas_left);
+                make.left.equalTo(imageView1);
             }];
             
             [imageView8 mas_makeConstraints:^(MASConstraintMaker *make) {
-                make.left.equalTo(imageView2.mas_left);
-                make.right.equalTo(backgroundView.mas_right).offset(-PADDING_FIVE); // 首行第3个右侧，与backgroundView的右侧，间隔－PADDING_FIVE
+                make.left.equalTo(imageView2);
+                make.right.equalTo(backgroundView).offset(-PADDING_FIVE); // 首行第3个右侧，与backgroundView的右侧，间隔－PADDING_FIVE
                 make.bottom.equalTo(backgroundView.mas_bottom).offset(-PADDING_FIVE); // 第3行首个的底部，与背景view的底部，间隔PADDING_FIVE
             }];
         }
@@ -488,12 +527,38 @@ static inline NSRegularExpression * TopicRegularExpression() {
     }
     
     CGSize size = [innerStr boundingRectWithSize:maxSize
-                                    options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
-                                 attributes:dict
-                                    context:nil].size;
+                                         options:NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading
+                                      attributes:dict
+                                         context:nil].size;
     return size;
 }
 
+// 将thumbnail url转换为bmiddle url
+- (NSURL *)replace:(NSString *)string occurrenceOfString:(NSString *)target withString:(NSString *)replacement {
+    NSURL *replacedUrl;
+    if ([string containsString:target]) {
+        NSString *replacedString = [string stringByReplacingOccurrencesOfString:target withString:replacement];
+        replacedUrl = [NSURL URLWithString:replacedString];
+        return replacedUrl;
+    } else {
+        return nil;
+    }
+}
 
+#pragma mark - Access method
+
+// 为各个子控件赋值，并根据不同数据源隐藏多余的控件
+- (void)setStatus:(XZStatus *)status {
+    [self configureSubViews];
+    [self configureData:status];
+    [self configureConstraints:status];
+}
+
+//- (NSMutableArray *)imageUrls {
+//    if (!_imageUrls) {
+//        _imageUrls = [[NSMutableArray alloc]initWithCapacity:1];
+//    }
+//    return _imageUrls;
+//}
 
 @end

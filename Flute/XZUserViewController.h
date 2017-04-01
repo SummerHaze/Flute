@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "XZFeedsViewController.h"
+
 @class XZUserView;
 
 @interface XZUserViewController : XZFeedsViewController <UIScrollViewDelegate, UITableViewDelegate, UITableViewDataSource>

@@ -87,12 +87,6 @@
 }
 
 - (void)layoutSubviews {
-//    [self.containerView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.edges.equalTo(self);
-//        make.height.equalTo(@300);
-//        make.width.equalTo(@750);
-//    }];
-
     self.location.text = self.userProfile.location;
     [self.location mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self).offset(10);

@@ -19,6 +19,9 @@
 #import "XZUserViewController.h"
 #import "XZTopicViewController.h"
 #import "XZUserView.h"
+#import "XZImageViewController.h"
+#import "XZImageView.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 
 static NSString *identifier = @"FeedsCell";
 static NSString *friendsTimelinesTable = @"friendsTimelines";
@@ -45,10 +48,21 @@ static NSString *userName = @"sumha201";
     
     // 初始化实例变量
     self.tabBarController.delegate = self; // 开启点击tabBar整体刷新
-    self.feedsTableView.fd_debugLogEnabled = NO;
 
     //加载数据
     [self.dataLoader.dbOperation DBExistAtPath:self.dbPath name:dbName]; // 没有DB则创建之
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(imageTouched:)
+                                                 name:XZImageViewPressedNotification
+                                               object:nil];
+    
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -56,54 +70,7 @@ static NSString *userName = @"sumha201";
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - getter
-
-- (NSUInteger)maxId {
-    if (!_maxId) {
-        _maxId = 1;
-    }
-    return _maxId;
-}
-
-- (NSInteger)pageNumber {
-    if (!_pageNumber) {
-        _pageNumber = 1;
-    }
-    return _pageNumber;
-}
-
-- (NSMutableArray *)feeds {
-    if (!_feeds) {
-        _feeds = [NSMutableArray arrayWithCapacity:1];
-    }
-    return _feeds;
-}
-
-- (XZLogin *)login {
-    if (!_login) {
-        _login = [XZLogin sharedInstance];
-    }
-    return _login;
-}
-
-- (XZDataLoader *)dataLoader {
-    if (!_dataLoader) {
-        _dataLoader = [[XZDataLoader alloc]init];
-    }
-    return _dataLoader;
-}
-
-- (NSString *)dbPath {
-    if (!_dbPath) {
-        NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        NSString *cacheDirectory = [cachePaths objectAtIndex:0];
-        _dbPath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.db", dbName]];
-    }
-    return _dbPath;
-}
-
-#pragma mark - 加载数据
-
+#pragma mark - public methods
 - (void)loadData {
     // 根据请求type，判断从哪个table中取缓存数据
     if (self.pageNumber == 1) {
@@ -113,12 +80,45 @@ static NSString *userName = @"sumha201";
             self.maxId = [self.dataLoader.dbOperation dataExistInDB:self.dbPath andTable:userTimelinesTable];
         }
     }
-
+    
     if (self.maxId) { // 本地有缓存
         [self loadFromLocalCache:self.type];
     } else { // 本地无缓存
         [self requestFromNetworkWithMaxId:1 type:self.type withDeletingDB:NO];
     }
+}
+
+#pragma mark - private methods
+
+- (void)configureSubviews {
+    // 添加tableview
+    self.feedsTableView.delegate = self;
+    self.feedsTableView.dataSource = self;
+    [self.view addSubview:self.feedsTableView];
+    
+    // 上拉刷新控件
+    __weak __typeof(self) weakSelf = self;
+    self.feedsTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
+        [weakSelf loadByDraggingUp];
+    }];
+    
+    // 下拉刷新控件
+    self.feedsTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
+        [weakSelf loadByDraggingDown];
+    }];
+}
+
+// 下拉刷新触发，需要清空DB
+- (void)loadByDraggingDown {
+    self.pageNumber = 1;
+    [self.feeds removeAllObjects];
+    [self requestFromNetworkWithMaxId:1 type:self.type withDeletingDB:YES];
+}
+
+// 上拉刷新触发，不需要清空DB
+- (void)loadByDraggingUp {
+    self.pageNumber += 1;
+    [self loadData];
 }
 
 // 从本地缓存加载数据
@@ -130,7 +130,7 @@ static NSString *userName = @"sumha201";
         caches = [NSMutableArray arrayWithArray:[self.dataLoader loadUserTimelineFromLocalDBAtPath:self.dbPath withMaxId:self.maxId andPageNumber:self.pageNumber]];
     }
     
-    if ([caches count]) { // 本地有缓存
+    if ([caches count] >= self.pageNumber * FEEDS_COUNT) { // 本地有缓存
         NSLog(@"本地有缓存，加载");
         XZStatus *status = caches.lastObject;
         self.maxId = status.statusId;
@@ -157,8 +157,9 @@ static NSString *userName = @"sumha201";
             if (success == YES) {
                 NSMutableArray *results = [NSMutableArray arrayWithCapacity:1];
                 NSArray *statuses = [responseObject objectForKey:@"statuses"];
+                NSLog(@"XZFeedsViewController--request statuses count: %lu", (unsigned long)[statuses count]);
                 
-                if (statuses.count) { // 可能返回数据为空
+                if (statuses.count && statuses.count % 5 == 0) { // 返回数据不能为空，且必须是5的倍数（有些时候后台返回4条数据，原因未知）
                     NSUInteger maxIdChanged = 1;
                     
                     // 处理responseObject
@@ -257,44 +258,23 @@ static NSString *userName = @"sumha201";
 
 }
 
-#pragma mark - Configure subviews
-
-- (void)configureSubviews {
-    // 添加tableview
-    self.feedsTableView = [[UITableView alloc]initWithFrame:
-                      CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-    self.feedsTableView.delegate = self;
-    self.feedsTableView.dataSource = self;
-    [self.feedsTableView registerClass:[XZFeedsCell class] forCellReuseIdentifier:identifier];
-    self.feedsTableView.fd_debugLogEnabled = YES;
+// 放大显示图片
+- (void)imageTouched:(NSNotification*)notification {
+    NSDictionary *userInfo = [notification userInfo];
+    NSURL *thumbnailUrl = [userInfo objectForKey:@"imageUrl"]; // 拿到的是小图Url
     
-    [self.view addSubview:self.feedsTableView];
+//    // 转换成中图url
+//    NSString *thumbString = [thumbnailUrl absoluteString];
+//    NSString *middleString;
+//    if ([thumbString containsString:@"thumbnail"]) {
+//        middleString = [thumbString stringByReplacingOccurrencesOfString:@"thumbnail" withString:@"bmiddle"];
+//    }
+//    NSURL *middleUrl = [NSURL URLWithString:middleString];
     
-    // 上拉刷新控件
-    __weak __typeof(self) weakSelf = self;
-    self.feedsTableView.mj_footer = [MJRefreshAutoNormalFooter footerWithRefreshingBlock:^{
-        [weakSelf loadByDraggingUp];
-    }];
-    
-    // 下拉刷新控件
-    self.feedsTableView.mj_header = [MJRefreshNormalHeader headerWithRefreshingBlock:^{
-        [weakSelf loadByDraggingDown];
-    }];
+    XZImageViewController *vc = [[XZImageViewController alloc] init];
+    vc.imageUrl = thumbnailUrl;
+    [self presentViewController:vc animated:YES completion:nil];
 }
-
-// 下拉刷新触发，需要清空DB
-- (void)loadByDraggingDown {
-    self.pageNumber = 1;
-    [self.feeds removeAllObjects];
-    [self requestFromNetworkWithMaxId:1 type:self.type withDeletingDB:YES];
-}
-
-// 上拉刷新触发，不需要清空DB
-- (void)loadByDraggingUp {
-    self.pageNumber += 1;
-    [self loadData];
-}
-
 
 #pragma mark - Table view datasource
 
@@ -303,7 +283,6 @@ static NSString *userName = @"sumha201";
     XZFeedsCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
     
     if ([self.feeds count] == FEEDS_COUNT * self.pageNumber) {
-        //        NSLog(@"current feed: %ld",(long)indexPath.row);
         cell.status = self.feeds[indexPath.row];
         
         cell.contentLabel.delegate = self;
@@ -319,7 +298,8 @@ static NSString *userName = @"sumha201";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if ([self.feeds count] == FEEDS_COUNT * self.pageNumber) {
-        CGFloat height = [tableView fd_heightForCellWithIdentifier:identifier cacheByIndexPath:indexPath
+        CGFloat height = [tableView fd_heightForCellWithIdentifier:identifier
+                                                  cacheByIndexPath:indexPath
                                                      configuration:^(XZFeedsCell *cell)
                           {
                               cell.status = self.feeds[indexPath.row]; // 配置Cell的数据源，与cellForRowAtIndexPath干的事一致
@@ -387,5 +367,63 @@ static NSString *userName = @"sumha201";
         [self.navigationController pushViewController:topic animated:YES];
     }
 }
+
+#pragma mark - getters and setters
+
+- (NSUInteger)maxId {
+    if (!_maxId) {
+        _maxId = 1;
+    }
+    return _maxId;
+}
+
+- (NSInteger)pageNumber {
+    if (!_pageNumber) {
+        _pageNumber = 1;
+    }
+    return _pageNumber;
+}
+
+- (NSMutableArray *)feeds {
+    if (!_feeds) {
+        _feeds = [NSMutableArray arrayWithCapacity:1];
+    }
+    return _feeds;
+}
+
+- (XZLogin *)login {
+    if (!_login) {
+        _login = [XZLogin sharedInstance];
+    }
+    return _login;
+}
+
+- (XZDataLoader *)dataLoader {
+    if (!_dataLoader) {
+        _dataLoader = [[XZDataLoader alloc]init];
+    }
+    return _dataLoader;
+}
+
+- (NSString *)dbPath {
+    if (!_dbPath) {
+        NSArray *cachePaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *cacheDirectory = [cachePaths objectAtIndex:0];
+        _dbPath = [cacheDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.db", dbName]];
+    }
+    return _dbPath;
+}
+
+- (UITableView *)feedsTableView {
+    if (!_feedsTableView) {
+        _feedsTableView = [[UITableView alloc]initWithFrame: CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
+//       _feedsTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, 375, 667)];
+        [_feedsTableView registerClass:[XZFeedsCell class] forCellReuseIdentifier:identifier];
+        _feedsTableView.fd_debugLogEnabled = NO;
+        
+    }
+    return _feedsTableView;
+}
+
 
 @end

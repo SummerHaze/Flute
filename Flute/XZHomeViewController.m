@@ -8,17 +8,6 @@
 
 #import "XZHomeViewController.h"
 #import "XZLogin.h"
-#import "WeiboAPI.h"
-#import "XZFeedsCell.h"
-#import "XZStatus.h"
-#import "MJRefresh.h"
-#import "XZDBOperation.h"
-#import "UITableView+FDTemplateLayoutCell.h"
-#import "XZDataLoader.h"
-#import "TTTAttributedLabel.h"
-#import "XZUserViewController.h"
-#import "XZTopicViewController.h"
-#import "XZUserView.h"
 
 @interface XZHomeViewController()
 

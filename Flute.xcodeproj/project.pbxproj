@@ -43,6 +43,10 @@
 		16827E6F1E03D2E4002BDFAB /* XZStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E6E1E03D2E4002BDFAB /* XZStatus.m */; };
 		16827E721E03D3A2002BDFAB /* XZFeedsFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */; };
 		16827E831E06DA56002BDFAB /* XZDBOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 16827E821E06DA56002BDFAB /* XZDBOperation.m */; };
+		168A00031E8A2EE900F96294 /* UIImage+ClipToSquare.m in Sources */ = {isa = PBXBuildFile; fileRef = 168A00021E8A2EE900F96294 /* UIImage+ClipToSquare.m */; };
+		168AFFFA1E89030A00F96294 /* XZImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 168AFFF91E89030A00F96294 /* XZImageViewController.m */; };
+		168AFFFD1E89109F00F96294 /* XZImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 168AFFFC1E89109F00F96294 /* XZImageView.m */; };
+		1693057F1E8B63C400F3F18A /* XZScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1693057E1E8B63C300F3F18A /* XZScrollView.m */; };
 		16D739431E82BBD600C10014 /* weibo.db in Resources */ = {isa = PBXBuildFile; fileRef = 16D739421E82BBD600C10014 /* weibo.db */; };
 		16E4899C1E7E7F7A00CB543B /* XZUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */; };
 		16E4899F1E7E7F8B00CB543B /* XZTopicViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 16E4899E1E7E7F8B00CB543B /* XZTopicViewController.m */; };
@@ -131,6 +135,14 @@
 		16827E711E03D3A2002BDFAB /* XZFeedsFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZFeedsFrame.m; sourceTree = "<group>"; };
 		16827E811E06DA56002BDFAB /* XZDBOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZDBOperation.h; sourceTree = "<group>"; };
 		16827E821E06DA56002BDFAB /* XZDBOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZDBOperation.m; sourceTree = "<group>"; };
+		168A00011E8A2EE900F96294 /* UIImage+ClipToSquare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ClipToSquare.h"; sourceTree = "<group>"; };
+		168A00021E8A2EE900F96294 /* UIImage+ClipToSquare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ClipToSquare.m"; sourceTree = "<group>"; };
+		168AFFF81E89030A00F96294 /* XZImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZImageViewController.h; sourceTree = "<group>"; };
+		168AFFF91E89030A00F96294 /* XZImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZImageViewController.m; sourceTree = "<group>"; };
+		168AFFFB1E89109F00F96294 /* XZImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZImageView.h; sourceTree = "<group>"; };
+		168AFFFC1E89109F00F96294 /* XZImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZImageView.m; sourceTree = "<group>"; };
+		1693057D1E8B63C300F3F18A /* XZScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZScrollView.h; sourceTree = "<group>"; };
+		1693057E1E8B63C300F3F18A /* XZScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZScrollView.m; sourceTree = "<group>"; };
 		16D739421E82BBD600C10014 /* weibo.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = weibo.db; sourceTree = SOURCE_ROOT; };
 		16E4899A1E7E7F7A00CB543B /* XZUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XZUserViewController.h; sourceTree = "<group>"; };
 		16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XZUserViewController.m; sourceTree = "<group>"; };
@@ -235,26 +247,7 @@
 				16827E801E06DA3D002BDFAB /* Service */,
 				16827E691E0393BA002BDFAB /* View */,
 				16827E231E0268B3002BDFAB /* Model */,
-				16827DF51E0254CD002BDFAB /* AppDelegate.h */,
-				16827DF61E0254CD002BDFAB /* AppDelegate.m */,
-				16E489C11E822FBA00CB543B /* XZFeedsViewController.h */,
-				16E489C21E822FBA00CB543B /* XZFeedsViewController.m */,
-				16827E171E025F07002BDFAB /* XZHomeViewController.h */,
-				16827E181E025F07002BDFAB /* XZHomeViewController.m */,
-				16E4899A1E7E7F7A00CB543B /* XZUserViewController.h */,
-				16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */,
-				16E4899D1E7E7F8B00CB543B /* XZTopicViewController.h */,
-				16E4899E1E7E7F8B00CB543B /* XZTopicViewController.m */,
-				162EFA6B1E5EB9F5007EA6C9 /* XZPostViewController.h */,
-				162EFA6C1E5EB9F5007EA6C9 /* XZPostViewController.m */,
-				162EFA741E5F32DA007EA6C9 /* XZMapViewController.h */,
-				162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */,
-				16827E1A1E026238002BDFAB /* XZSearchViewController.h */,
-				16827E1B1E026238002BDFAB /* XZSearchViewController.m */,
-				16827E271E028D64002BDFAB /* XZProfileViewController.h */,
-				16827E281E028D64002BDFAB /* XZProfileViewController.m */,
-				16827E201E0266CF002BDFAB /* XZLoginViewController.h */,
-				16827E211E0266CF002BDFAB /* XZLoginViewController.m */,
+				168AFFF71E8902CF00F96294 /* View Controller */,
 				16827DF21E0254CD002BDFAB /* Supporting Files */,
 			);
 			path = Flute;
@@ -263,6 +256,8 @@
 		16827DF21E0254CD002BDFAB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				16827DF51E0254CD002BDFAB /* AppDelegate.h */,
+				16827DF61E0254CD002BDFAB /* AppDelegate.m */,
 				16D739421E82BBD600C10014 /* weibo.db */,
 				16827E531E02C3E0002BDFAB /* Singleton.h */,
 				16827E561E02C8B5002BDFAB /* WeiboAPI.h */,
@@ -336,6 +331,10 @@
 				16E489A11E7EDA2E00CB543B /* XZUserInfoView.m */,
 				16E489BE1E80FB6500CB543B /* XZUserView.h */,
 				16E489BF1E80FB6500CB543B /* XZUserView.m */,
+				168AFFFB1E89109F00F96294 /* XZImageView.h */,
+				168AFFFC1E89109F00F96294 /* XZImageView.m */,
+				1693057D1E8B63C300F3F18A /* XZScrollView.h */,
+				1693057E1E8B63C300F3F18A /* XZScrollView.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -345,8 +344,37 @@
 			children = (
 				16827E811E06DA56002BDFAB /* XZDBOperation.h */,
 				16827E821E06DA56002BDFAB /* XZDBOperation.m */,
+				168A00011E8A2EE900F96294 /* UIImage+ClipToSquare.h */,
+				168A00021E8A2EE900F96294 /* UIImage+ClipToSquare.m */,
 			);
 			name = Service;
+			sourceTree = "<group>";
+		};
+		168AFFF71E8902CF00F96294 /* View Controller */ = {
+			isa = PBXGroup;
+			children = (
+				16E489C11E822FBA00CB543B /* XZFeedsViewController.h */,
+				16E489C21E822FBA00CB543B /* XZFeedsViewController.m */,
+				16827E171E025F07002BDFAB /* XZHomeViewController.h */,
+				16827E181E025F07002BDFAB /* XZHomeViewController.m */,
+				16E4899A1E7E7F7A00CB543B /* XZUserViewController.h */,
+				16E4899B1E7E7F7A00CB543B /* XZUserViewController.m */,
+				16E4899D1E7E7F8B00CB543B /* XZTopicViewController.h */,
+				16E4899E1E7E7F8B00CB543B /* XZTopicViewController.m */,
+				168AFFF81E89030A00F96294 /* XZImageViewController.h */,
+				168AFFF91E89030A00F96294 /* XZImageViewController.m */,
+				162EFA6B1E5EB9F5007EA6C9 /* XZPostViewController.h */,
+				162EFA6C1E5EB9F5007EA6C9 /* XZPostViewController.m */,
+				162EFA741E5F32DA007EA6C9 /* XZMapViewController.h */,
+				162EFA751E5F32DA007EA6C9 /* XZMapViewController.m */,
+				16827E1A1E026238002BDFAB /* XZSearchViewController.h */,
+				16827E1B1E026238002BDFAB /* XZSearchViewController.m */,
+				16827E271E028D64002BDFAB /* XZProfileViewController.h */,
+				16827E281E028D64002BDFAB /* XZProfileViewController.m */,
+				16827E201E0266CF002BDFAB /* XZLoginViewController.h */,
+				16827E211E0266CF002BDFAB /* XZLoginViewController.m */,
+			);
+			name = "View Controller";
 			sourceTree = "<group>";
 		};
 		4DF76878EEC1C9C3789CA9A2 /* Pods */ = {
@@ -520,9 +548,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				16827DF71E0254CD002BDFAB /* AppDelegate.m in Sources */,
+				168A00031E8A2EE900F96294 /* UIImage+ClipToSquare.m in Sources */,
 				16E489A21E7EDA2E00CB543B /* XZUserInfoView.m in Sources */,
 				16E489A51E7FC6BC00CB543B /* XZUserProfile.m in Sources */,
 				16E4899C1E7E7F7A00CB543B /* XZUserViewController.m in Sources */,
+				168AFFFD1E89109F00F96294 /* XZImageView.m in Sources */,
 				16827E721E03D3A2002BDFAB /* XZFeedsFrame.m in Sources */,
 				162EFA6D1E5EB9F5007EA6C9 /* XZPostViewController.m in Sources */,
 				16827E831E06DA56002BDFAB /* XZDBOperation.m in Sources */,
@@ -530,6 +560,7 @@
 				16F3B9C91E5C20C5003BB866 /* XZDataLoader.m in Sources */,
 				16827E6C1E039638002BDFAB /* XZFeedsCell.m in Sources */,
 				16827E291E028D64002BDFAB /* XZProfileViewController.m in Sources */,
+				1693057F1E8B63C400F3F18A /* XZScrollView.m in Sources */,
 				16E4899F1E7E7F8B00CB543B /* XZTopicViewController.m in Sources */,
 				16827E6F1E03D2E4002BDFAB /* XZStatus.m in Sources */,
 				16E489C31E822FBA00CB543B /* XZFeedsViewController.m in Sources */,
@@ -539,6 +570,7 @@
 				162EFA761E5F32DA007EA6C9 /* XZMapViewController.m in Sources */,
 				16827E1C1E026238002BDFAB /* XZSearchViewController.m in Sources */,
 				16827E191E025F07002BDFAB /* XZHomeViewController.m in Sources */,
+				168AFFFA1E89030A00F96294 /* XZImageViewController.m in Sources */,
 				162EFA731E5EF229007EA6C9 /* XZStatusUploader.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
